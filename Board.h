@@ -1,11 +1,9 @@
 #pragma once
 
-// #include "Piece.h"
+#include "Piece.h"
 #include "Location.h"
 #include <map>
 #include <numeric>
-
-class Piece; // TODO: remove upon Piece implementation
 
 class Board {
 
