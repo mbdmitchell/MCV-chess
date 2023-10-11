@@ -12,7 +12,7 @@ public:
     /// DATA MEMBERS
 protected:
     Colour colour;
-
+public:
     /// CONSTRUCTORS / DESTRUCTORS
     explicit Piece(Colour colour);
     virtual ~Piece() = default;
