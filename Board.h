@@ -22,7 +22,7 @@ class Board {
     /// GETTERS
 
     /// OPERATORS
-
+public:
     // "function 'operator[]' with deduced return type cannot be used before it is defined"
     auto& operator[](const Location<>& location) {
         if (board.find(location) == board.end()) {
