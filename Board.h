@@ -13,7 +13,7 @@ class Board {
 
     /// FRIENDS
     friend class GameController;
-
+    friend class GameViewCLI;
 
     /// STRUCTS
 
