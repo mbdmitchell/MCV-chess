@@ -97,7 +97,7 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
 void GameController::submitMove(const Location<> &source, const Location<> &destination) {
     // validation
     if (!isValidMove(source, destination)) return;
-    if (moveLeavesMoverInCheck(source, destination)) return;
+    //if (moveLeavesMoverInCheck(source, destination)) return;
     // move
     makeMove(source, destination);
     // handle any post-move things that need sorting
@@ -138,3 +138,36 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
     // TODO: pawn promotion
 
     return true;
+Location<> GameController::getLocationOfKing(Piece::Colour kingColour) {
+    const auto& board = game.board.board;
+    auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
+        const auto& piece = entry.second;
+        return (piece->getColour() == kingColour) && (dynamic_cast<King*>(piece.get()) != nullptr);
+    });
+
+    return (it != board.end() ? it->first : Location{});
+}
+
+bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opponentsColour) {
+    // NB: a square isn't marked as under attack if the attacker has a piece there.
+    // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
+    // and you cant castle through an en passant target square, this is a moot issue
+    const auto& board = game.board.board;
+
+    auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
+        const auto& [source, sourcePiece] = it;
+        if (sourcePiece.get()->getColour() != opponentsColour) return false;
+        return GameController::isValidMove(source, target);
+    };
+
+    return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
+}
+
+void GameController::setEnPassantTargetSquare(const Location<> &source, const Location<> &destination) {
+    const Location<>::RowColumnDifferences locationDifferences = Location<>::calculateRowColumnDifferences(source, destination);
+    if (dynamic_cast<Pawn*>(game.board.pieceAt(destination)) != nullptr && abs(locationDifferences.rowDifference) == 2) {
+        game.enPassantTargetSquare = destination;
+    } else {
+        game.enPassantTargetSquare = Location{};
+    }
+}
