@@ -45,3 +45,51 @@ void GameController::setup() {
 void GameController::displayBoard() const {
     gameView->viewBoard(game.board);
 }
+
+void GameController::makeMove(const Location<> &source, const Location<> &destination) {
+
+    Board& board = game.board;
+
+    const auto handleRookCastlingMove = [&]() -> void {
+        if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
+            board.insert(Location{"D1"}, board.pieceAt(Location{"A1"})->clone());
+            board.erase(Location{"A1"});
+        }
+        else if (destination == Location{"G1"}) { //whiteCastingAvailability.kingSide;
+            board.insert(Location{"F1"}, board.pieceAt(Location{"H1"})->clone());
+            board.erase(Location{"H1"});
+        }
+        else if (destination == Location{"C8"}) { //blackCastingAvailability.queenSide;
+            board.insert(Location{"D8"}, board.pieceAt(Location{"A8"})->clone());
+            board.erase(Location{"A8"});
+        }
+        else { // (destination == Location("G8")) //blackCastingAvailability.kingSide;
+            board.insert(Location{"F8"}, board.pieceAt(Location{"H8"})->clone());
+            board.erase(Location{"H8"});
+        }
+    };
+
+    board.erase(destination); // if piece already there
+    board.insert(destination, std::move(board[source]));
+    board.erase(source);
+
+    // logistics for special moves
+
+    // 1. en passant
+    /*if (isEnPassant(source, destination)) {
+        board.erase(game.enPassantTargetSquare);
+        return;
+    }*/
+
+    // 2. castling
+    /*if (isCastlingAttempt(source, destination)) {
+        handleRookCastlingMove();
+        //updateCastingAvailability(MOVING_KING, MOVING_ROOK, SOURCE);
+    }*/
+
+    /*
+    // 3. pawn promotion
+    if (const int DESTINATION_ROW = DESTINATION.getRow(); MOVING_PAWN && (DESTINATION_ROW == 0 || DESTINATION_ROW == 7)){
+        board.addPiece(DESTINATION, move.getPromotionPiece());
+    }*/
+}

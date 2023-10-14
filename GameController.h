@@ -11,8 +11,6 @@ class GameController {
     std::unique_ptr<GameView> gameView = std::make_unique<GameViewCLI>(); // Change if implementing other `GameView`s
 /// FRIENDS
 
-/// CONSTRUCTORS
-
 /// CONSTRUCTORS / OVERLOADS
 public:
     GameController() = default;
@@ -33,4 +31,6 @@ public:
 public:
     void setup();
     void displayBoard() const;
+private:
+    void makeMove(const Location<> &source, const Location<> &destination);
 };
