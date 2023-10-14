@@ -93,3 +93,33 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
         board.addPiece(DESTINATION, move.getPromotionPiece());
     }*/
 }
+
+bool GameController::isValidMove(const Location<> &source, const Location<> &destination) {
+    const auto& board = game.board;
+    const auto& moversColour = game.activePlayer.getColour();
+    const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
+
+    // universal conditions
+    if ( game.gameState != Game::IN_PROGRESS
+         ||   Board::isLocationOutOfBounds(source)
+         ||   Board::isLocationOutOfBounds(destination)
+         || ! board.thereExistsPieceAt(source)
+         ||  (board.thereExistsPieceAt(destination)
+              && board[destination]->getColour() == moversColour)
+         ||   board.pieceAt(source)->getColour() != moversColour
+         || ! board[source]->isValidMovePath(source, destination, game.enPassantTargetSquare, isDirectCapture)
+         ||   board.isPathBlocked(source, destination) )
+    {
+        return false;
+    }
+
+    // piece-dependant conditions
+
+    // castling
+    //if (isCastlingAttempt(game, source, destination) && !isValidCastling(source, destination)) {
+    //    return false;
+    //}
+
+    // TODO: pawn promotion
+
+    return true;

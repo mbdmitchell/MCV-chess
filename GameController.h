@@ -33,4 +33,5 @@ public:
     void displayBoard() const;
 private:
     void makeMove(const Location<> &source, const Location<> &destination);
+    bool isValidMove(const Location<> &source, const Location<> &destination);
 };
