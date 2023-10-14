@@ -94,6 +94,21 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
     }*/
 }
 
+void GameController::submitMove(const Location<> &source, const Location<> &destination) {
+    // validation
+    if (!isValidMove(source, destination)) return;
+    if (moveLeavesMoverInCheck(source, destination)) return;
+    // move
+    makeMove(source, destination);
+    // handle any post-move things that need sorting
+    setEnPassantTargetSquare(source, destination);
+    swapActivePlayer();
+}
+
+void GameController::swapActivePlayer() {
+    game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
+}
+
 bool GameController::isValidMove(const Location<> &source, const Location<> &destination) {
     const auto& board = game.board;
     const auto& moversColour = game.activePlayer.getColour();

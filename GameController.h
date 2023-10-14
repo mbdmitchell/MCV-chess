@@ -31,6 +31,7 @@ public:
 public:
     void setup();
     void displayBoard() const;
+    void submitMove(const Location<> &source, const Location<> &destination);
 private:
     void makeMove(const Location<> &source, const Location<> &destination);
     bool isValidMove(const Location<> &source, const Location<> &destination);
