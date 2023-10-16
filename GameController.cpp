@@ -138,6 +138,25 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
     // TODO: pawn promotion
 
     return true;
+}
+
+bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) {
+
+    GameController copy {*this}; // store controller (inc. game state) in copy
+
+    const auto& moverColour = game.activePlayer.getColour();
+    const auto& opponentColour = moverColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
+
+    makeMove(source, destination);
+    swapActivePlayer(); // must be done manually as move not handled through submitMove()
+
+    bool returnValue = isUnderAttackBy(getLocationOfKing(moverColour),opponentColour);
+    swapActivePlayer(); // TODO: this bug fix makes me sad... (without this line, moveLeavesMoverInCheck had side-effect of swapping the game.activePlayer)
+
+    *this = copy;
+    return returnValue;
+}
+
 Location<> GameController::getLocationOfKing(Piece::Colour kingColour) {
     const auto& board = game.board.board;
     auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {

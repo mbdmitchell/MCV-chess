@@ -38,6 +38,9 @@ private:
     void swapActivePlayer();
 
     bool isValidMove(const Location<> &source, const Location<> &destination);
+
+    bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination);
+
     Location<> getLocationOfKing(Piece::Colour kingColour);
     bool isUnderAttackBy(Location<> location, const Piece::Colour& opponentsColour);
     void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
