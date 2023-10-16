@@ -18,6 +18,7 @@ public:
         : game{rhs.game}, gameView{std::make_unique<GameViewCLI>()} { } // Change if implementing other `GameView`s
     GameController& operator=(const GameController& rhs){
         gameView = std::make_unique<GameViewCLI>();
+        game.board.board.clear(); // bug fix for moveLeavesMoverInCheck() where `*this = copy` didn't remove the moved piece
         game = rhs.game;
         return *this;
     }
