@@ -190,3 +190,33 @@ void GameController::setEnPassantTargetSquare(const Location<> &source, const Lo
         game.enPassantTargetSquare = Location{};
     }
 }
+
+bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) {
+
+    if (!isCastlingAttempt(source, destination)) return false;
+    // if (kingAlreadyMoved() return false;
+
+    if (destination == Location{"C1"}) {
+        return game.whiteCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B1"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
+    } else if (destination == Location{"C8"}) {
+        return game.blackCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B8"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
+    } else if (destination == Location{"G1"}) {
+        return game.whiteCastingAvailability.kingSide;
+    } else if (destination == Location{"G8"}) {
+        return game.blackCastingAvailability.kingSide;
+    }
+
+    return false;
+}
+
+bool GameController::isCastlingAttempt(const Location<> &source, const Location<> &destination) {
+    const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
+    if ((dynamic_cast<King*>(game.board.pieceAt(source)) != nullptr)
+        || rowDifference != 0
+        || abs(columnDifference) != 2
+        || (!(source == Location{"E1"} || source == Location{"E8"})))
+    {
+        return false;
+    }
+    return true;
+}
