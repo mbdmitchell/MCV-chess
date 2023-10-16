@@ -11,8 +11,6 @@ class Game {
     struct castingAvailability {
         bool kingSide = true;
         bool queenSide = true;
-        void setKing(bool val) { kingSide = val; }
-        void setQueen(bool val) { queenSide = val; }
     };
 
     /// DATA MEMBERS
