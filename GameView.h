@@ -6,6 +6,7 @@ class GameView {
 public:
     virtual void viewBoard(const Board& b) const = 0;
     virtual void viewPiece(gsl::not_null<const Piece*> piece) const = 0;
+    virtual ~GameView() = default;
 };
 
 class GameViewCLI : public GameView {
