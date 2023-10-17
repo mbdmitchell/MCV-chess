@@ -55,68 +55,20 @@ public:
         return board.cend();
     }
 
-
     /// VALIDATION
 
 
     /// MISC.
 
-    bool isPathBlocked(const Location<> &source, const Location<> &destination) const {
+    [[nodiscard]] bool isPathBlocked(const Location<> &source, const Location<> &destination) const;
 
-        const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
+    [[nodiscard]] bool thereExistsPieceAt(const Location<> &location) const;
 
-        const auto minimalDistanceMoveForGivenDirection = [&] {
-            const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
-            if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
-                return Location<>::RowColumnDifferences {0, 0};
-            } else if (totalChangeInRow == 0) {
-                return Location<>::RowColumnDifferences {0, totalChangeInColumn/abs(totalChangeInColumn)};
-            } else if (totalChangeInColumn == 0) {
-                return Location<>::RowColumnDifferences {totalChangeInRow / abs(totalChangeInRow), 0};
-            } else {
-                auto gcd = std::gcd(abs(totalChangeInRow), abs(totalChangeInColumn));
-                return Location<>::RowColumnDifferences {totalChangeInRow / gcd, totalChangeInColumn / gcd};
-            }
-        }();
+    Piece* pieceAt(const Location<>& location) const;
 
-        auto toNextSquare = [](const Location<>& location, const Location<>::RowColumnDifferences& minimal) -> Location<> {
-            const auto& [row, column] = location;
+    void erase(const Location<>& location);
 
-            const gsl::index r = row.value() + minimal.rowDifference;
-            const gsl::index c = column.value() + minimal.columnDifference;
-
-            return {r, c};
-        };
-
-        Location current = toNextSquare(source, minimalDistanceMoveForGivenDirection);
-        while (current != destination) {
-            if (thereExistsPieceAt(current)) {
-                return true;
-            }
-            current = toNextSquare(current, minimalDistanceMoveForGivenDirection);
-        }
-
-        return false;
-    }
-
-    [[nodiscard]] bool thereExistsPieceAt(const Location<> &location) const {
-        return board.contains(location);
-    }
-
-    Piece* pieceAt(const Location<>& location) const {
-        if (!board.contains(location)) {
-            return nullptr;
-        }
-        return board.at(location).get();
-    }
-
-    void erase(const Location<>& location) {
-        board.erase(location);
-    }
-
-    void insert(const Location<>& location, std::unique_ptr<Piece> piece) {
-        board.insert({location,std::move(piece)});
-    }
+    void insert(const Location<>& location, std::unique_ptr<Piece> piece);
 
 };
 
