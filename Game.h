@@ -29,11 +29,7 @@ class Game {
     /// CONSTRUCTORS and related
 public:
     Game() = default;
-
-    // Copy operator
     Game(const Game& other);
-
-    // Copy assignment operator
     Game& operator=(const Game& other);
 };
 
