@@ -57,16 +57,16 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
     // logistics for special moves
 
     // 1. en passant
-    /*if (isEnPassant(source, destination)) {
+    if (isEnPassant(source, destination)) {
         board.erase(game.enPassantTargetSquare);
         return;
-    }*/
+    }
 
     // 2. castling
-    /*if (isCastlingAttempt(source, destination)) {
-        handleRookCastlingMove();
-        //updateCastingAvailability(MOVING_KING, MOVING_ROOK, SOURCE);
-    }*/
+    if (isCastlingAttempt(source, destination)) {
+        handleRookCastlingMove(destination);
+        return;
+    }
 
     /*
     // 3. pawn promotion
@@ -78,7 +78,9 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
 void GameController::submitMove(const Location<> &source, const Location<> &destination) {
     // validation
     if (!isValidMove(source, destination)) return;
-    //if (moveLeavesMoverInCheck(source, destination)) return;
+    if (moveLeavesMoverInCheck(source, destination)) return;
+
+    const std::unique_ptr<Piece> pieceMoved = game.board.pieceAt(source)->clone(); // now we know it's valid we're safe to assign pieceMoved
 
     // move
     makeMove(source, destination);
@@ -199,6 +201,38 @@ bool GameController::isCastlingAttempt(const Location<> &source, const Location<
     return true;
 }
 
+void GameController::updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source) {
+    if (dynamic_cast<const King*>(pieceMoved.get()) != nullptr) { // if pieceMoved's type == King
+        if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
+            game.whiteCastingAvailability = {false, false};
+        } else {
+            game.blackCastingAvailability = { false, false };
+        }
+    } else if (dynamic_cast<const Rook*>(pieceMoved.get()) != nullptr) { // todo: remove `!=/== nullptr` throughout. (if you want to keep the bool "look", `static_cast<bool>(dynamic_cast...)`
+        if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
+            if (source == Location("A1")) {
+                game.whiteCastingAvailability.queenSide = false;
+            } else if (source == Location("H1")) {
+                game.whiteCastingAvailability.kingSide = false;
+            }
+        } else {
+            if (source == Location("A8")) {
+                game.blackCastingAvailability.queenSide = false;
+            } else if (source == Location("H8")) {
+                game.blackCastingAvailability.kingSide = false;
+            }
+        }
+    }
+
+}
+
+bool GameController::isEnPassant(const Location<> &source, const Location<> &destination) const {
+    const auto& [sourceRow, sourceColumn] = source;
+    const auto& [destinationRow, destinationColumn] = destination;
+    return (dynamic_cast<Pawn*>(game.board.pieceAt(destination)) != nullptr
+            && game.enPassantTargetSquare == Location<>{sourceRow.value(), destinationColumn.value()});
+}
+
 void GameController::handleRookCastlingMove(const Location<> &destination) {
     Board& board = game.board;
     if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
@@ -217,4 +251,52 @@ void GameController::handleRookCastlingMove(const Location<> &destination) {
         board.insert(Location{"F8"}, board.pieceAt(Location{"H8"})->clone());
         board.erase(Location{"H8"});
     }
+}
+
+Game::GameState GameController::calculateGameState() const {
+    if (thereExistsValidMove(game.activePlayer)) {
+        /*if (isDrawByInsufficientMaterial() || isThreeFoldRepetition() || isFiftyMoveRule())
+            return GameState::DRAW*/
+        return Game::GameState::IN_PROGRESS;
+    }
+    else {
+        //const auto& activePlayerColour = game.activePlayer.getColour();
+        //const auto opposingPlayerColour = activePlayerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
+        if (inCheck(game.activePlayer)) { // TODO: Test inCheck()
+        //if (isUnderAttackBy(getLocationOfKing(activePlayerColour),opposingPlayerColour)) {
+            return game.activePlayer.getColour() == Piece::Colour::WHITE ? Game::GameState::BLACK_WIN : Game::GameState::WHITE_WIN;
+        }
+        else {
+            return Game::GameState::STALEMATE;
+        }
+    }
+}
+
+bool GameController::thereExistsValidMove(const Player& activePlayer) const {
+    GameController copy {*this};
+    for (const auto& [source, piece] : copy.game.board) {
+        if (piece->getColour() != activePlayer.getColour()) continue;
+        for (Location destination = Location{"A1"}; destination <= Location{"H8"}; ++destination) {
+            if (copy.isValidMove(source, destination) && !copy.moveLeavesMoverInCheck(source, destination)) return true;
+        }
+    }
+    return false;
+}
+
+void GameController::initGameLoop() {
+    while (game.gameState == Game::GameState::IN_PROGRESS){
+        displayBoard();
+        std::cout << '\n';
+        try {
+            submitMove(Location{gameView->readInput("Type source square: ")}, Location{gameView->readInput("Type destination square: ")});
+            game.gameState = calculateGameState();
+        }
+        catch (const std::exception& e) { gameView->logException(e); }
+    }
+}
+
+bool GameController::inCheck(const Player& player) const {
+    const Piece::Colour playerColour = player.getColour();
+    const Piece::Colour opponentColour = playerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
+    return isUnderAttackBy(getLocationOfKing(playerColour),opponentColour);
 }
