@@ -115,10 +115,9 @@ public:
 
     Location& operator++() { // (++obj)
         if (boardColumnIndex < maxColumnIndex) {
-            ++(*boardColumnIndex);
+            *this = Location{this->getBoardRowIndex().value(), this->getBoardColumnIndex().value() + 1};
         } else {
-            boardColumnIndex = 0;
-            ++(*boardRowIndex);
+            *this = Location{this->getBoardRowIndex().value() + 1, 0};
         }
         if (!isValid()) {
             throw std::out_of_range("Attempted to iterate to out-of-range Location");
@@ -126,9 +125,9 @@ public:
         return *this;
     }
 
-    Location operator++(int) {
+    Location operator++(int) { // (obj++)
         Location copy {*this};
-        (*this)++;
+        ++(*this);
         return copy;
     }
 

@@ -58,11 +58,6 @@ public:
 
     /// VALIDATION
 
-    [[nodiscard]] static bool isLocationOutOfBounds(const Location<>& location) {
-        const auto& [row, col] = location;
-        return (row > location.getMaxRowIndex() || col > location.getMaxColumnIndex());
-    }
-
 
     /// MISC.
 

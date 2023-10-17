@@ -115,12 +115,8 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
 
     // universal conditions
-    if ( game.gameState != Game::IN_PROGRESS
-         ||   Board::isLocationOutOfBounds(source)
-         ||   Board::isLocationOutOfBounds(destination)
-         || ! board.thereExistsPieceAt(source)
-         ||  (board.thereExistsPieceAt(destination)
-              && board[destination]->getColour() == moversColour)
+    if (    ! board.thereExistsPieceAt(source)
+         ||  (board.thereExistsPieceAt(destination) && board[destination]->getColour() == moversColour)
          ||   board.pieceAt(source)->getColour() != moversColour
          || ! board[source]->isValidMovePath(source, destination, game.enPassantTargetSquare, isDirectCapture)
          ||   board.isPathBlocked(source, destination) )
