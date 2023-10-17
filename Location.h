@@ -61,8 +61,8 @@ public:
 
     [[nodiscard]] static constexpr gsl::index getMaxColumnIndex() { return maxColumnIndex; }
     [[nodiscard]] static constexpr gsl::index getMaxRowIndex() { return maxRowIndex; }
-    [[nodiscard]] const auto getBoardRowIndex() const { return boardRowIndex; }
-    [[nodiscard]] const auto getBoardColumnIndex() const { return boardColumnIndex; }
+    [[nodiscard]] auto getBoardRowIndex() const { return boardRowIndex; }
+    [[nodiscard]] auto getBoardColumnIndex() const { return boardColumnIndex; }
 
     /// ... For structured bindings
     template<size_t I>
@@ -174,7 +174,7 @@ public:
 
     /// MISC.
 private:
-    static Indices calculateIndices(const Location& source, const Location& destination) {
+    [[nodiscard]] static Indices calculateIndices(const Location& source, const Location& destination) {
         return {destination.boardColumnIndex.value(),
                 destination.boardRowIndex.value(),
                 source.boardColumnIndex.value(),

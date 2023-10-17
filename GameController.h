@@ -38,16 +38,23 @@ private:
 
     void swapActivePlayer();
 
-    bool isValidMove(const Location<> &source, const Location<> &destination);
+    [[nodiscard]] bool isValidMove(const Location<> &source, const Location<> &destination) const;
 
-    bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination);
+    [[nodiscard]] bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const;
 
-    Location<> getLocationOfKing(Piece::Colour kingColour);
-    bool isUnderAttackBy(Location<> location, const Piece::Colour& opponentsColour);
+    [[nodiscard]] Location<> getLocationOfKing(Piece::Colour kingColour) const;
+
+    [[nodiscard]] bool isUnderAttackBy(Location<> location, const Piece::Colour& opponentsColour) const;
+
     void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
 
     bool isValidCastling(const Location<> &source, const Location<> &destination);
+    [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool isCastlingAttempt(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
 
-    bool isCastlingAttempt(const Location<> &source, const Location<> &destination);
+    [[nodiscard]] Game::GameState calculateGameState() const;
 
+    [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
+    [[nodiscard]] bool inCheck(const Player& player) const;
 };
