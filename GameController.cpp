@@ -84,7 +84,9 @@ void GameController::submitMove(const Location<> &source, const Location<> &dest
 
     // move
     makeMove(source, destination);
-    // handle any post-move things that need sorting
+
+    // post-move things that need sorting
+    updateCastingAvailability(pieceMoved.get(), source);
     setEnPassantTargetSquare(source, destination);
     swapActivePlayer();
 }
