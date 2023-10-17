@@ -119,9 +119,6 @@ public:
         } else {
             *this = Location{this->getBoardRowIndex().value() + 1, 0};
         }
-        if (!isValid()) {
-            throw std::out_of_range("Attempted to iterate to out-of-range Location");
-        }
         return *this;
     }
 
