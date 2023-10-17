@@ -64,7 +64,7 @@ public:
 
     [[nodiscard]] bool thereExistsPieceAt(const Location<> &location) const;
 
-    Piece* pieceAt(const Location<>& location) const;
+    [[nodiscard]] Piece* pieceAt(const Location<>& location) const;
 
     void erase(const Location<>& location);
 
