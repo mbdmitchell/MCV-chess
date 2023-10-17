@@ -50,26 +50,7 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
 
     Board& board = game.board;
 
-    const auto handleRookCastlingMove = [&]() -> void {
-        if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
-            board.insert(Location{"D1"}, board.pieceAt(Location{"A1"})->clone());
-            board.erase(Location{"A1"});
-        }
-        else if (destination == Location{"G1"}) { //whiteCastingAvailability.kingSide;
-            board.insert(Location{"F1"}, board.pieceAt(Location{"H1"})->clone());
-            board.erase(Location{"H1"});
-        }
-        else if (destination == Location{"C8"}) { //blackCastingAvailability.queenSide;
-            board.insert(Location{"D8"}, board.pieceAt(Location{"A8"})->clone());
-            board.erase(Location{"A8"});
-        }
-        else { // (destination == Location("G8")) //blackCastingAvailability.kingSide;
-            board.insert(Location{"F8"}, board.pieceAt(Location{"H8"})->clone());
-            board.erase(Location{"H8"});
-        }
-    };
-
-    board.erase(destination); // if piece already there
+    board.erase(destination); // in case piece already there
     board.insert(destination, std::move(board[source]));
     board.erase(source);
 
@@ -98,6 +79,7 @@ void GameController::submitMove(const Location<> &source, const Location<> &dest
     // validation
     if (!isValidMove(source, destination)) return;
     //if (moveLeavesMoverInCheck(source, destination)) return;
+
     // move
     makeMove(source, destination);
     // handle any post-move things that need sorting
@@ -127,9 +109,9 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
     // piece-dependant conditions
 
     // castling
-    //if (isCastlingAttempt(game, source, destination) && !isValidCastling(source, destination)) {
-    //    return false;
-    //}
+    if (isCastlingAttempt(source, destination) && !isValidCastling(source, destination)) {
+        return false;
+    }
 
     // TODO: pawn promotion
 
@@ -215,4 +197,24 @@ bool GameController::isCastlingAttempt(const Location<> &source, const Location<
         return false;
     }
     return true;
+}
+
+void GameController::handleRookCastlingMove(const Location<> &destination) {
+    Board& board = game.board;
+    if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
+        board.insert(Location{"D1"}, board.pieceAt(Location{"A1"})->clone());
+        board.erase(Location{"A1"});
+    }
+    else if (destination == Location{"G1"}) { //whiteCastingAvailability.kingSide;
+        board.insert(Location{"F1"}, board.pieceAt(Location{"H1"})->clone());
+        board.erase(Location{"H1"});
+    }
+    else if (destination == Location{"C8"}) { //blackCastingAvailability.queenSide;
+        board.insert(Location{"D8"}, board.pieceAt(Location{"A8"})->clone());
+        board.erase(Location{"A8"});
+    }
+    else { // (destination == Location("G8")) //blackCastingAvailability.kingSide;
+        board.insert(Location{"F8"}, board.pieceAt(Location{"H8"})->clone());
+        board.erase(Location{"H8"});
+    }
 }
