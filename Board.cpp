@@ -7,7 +7,7 @@
 bool Board::isPathBlocked(const Location<> &source, const Location<> &destination) const {
 
     const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    const Location<>::RowColumnDifferences minimalDistanceMoveForGivenDirection = [&] { // TODO: I know its only called once but may be clearer as member function?
+    const auto minimalDistanceMoveForGivenDirection = std::invoke([&] { // TODO: I know its only called once but may be clearer as member function?
         const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
         if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
             return Location<>::RowColumnDifferences {0, 0};
@@ -19,7 +19,7 @@ bool Board::isPathBlocked(const Location<> &source, const Location<> &destinatio
             auto gcd = std::gcd(abs(totalChangeInRow), abs(totalChangeInColumn));
             return Location<>::RowColumnDifferences {totalChangeInRow / gcd, totalChangeInColumn / gcd};
         }
-    }();
+    });
 
     auto toNextSquare = [](const Location<>& location, const Location<>::RowColumnDifferences& minimal) -> Location<> {
         const auto& [row, column] = location;
