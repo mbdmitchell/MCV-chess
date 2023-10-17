@@ -7,7 +7,7 @@
 bool Board::isPathBlocked(const Location<> &source, const Location<> &destination) const {
 
     const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    const auto minimalDistanceMoveForGivenDirection = [&] { // TODO: I know its only called once but may be clearer as member function?
+    const Location<>::RowColumnDifferences minimalDistanceMoveForGivenDirection = [&] { // TODO: I know its only called once but may be clearer as member function?
         const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
         if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
             return Location<>::RowColumnDifferences {0, 0};
