@@ -6,8 +6,6 @@
 
 Game::Game(const Game &other)
         : gameState{other.gameState}
-        , player1{other.player1}
-        , player2{other.player2}
         , enPassantTargetSquare{other.enPassantTargetSquare}
         , whiteCastingAvailability{other.whiteCastingAvailability}
         , blackCastingAvailability{other.blackCastingAvailability}
@@ -18,9 +16,18 @@ Game::Game(const Game &other)
 }
 
 Game &Game::operator=(const Game &other) {
-    if (this != &other) {  // Check for self-assignment
-        Game temp(other); // Create a temporary copy
-        std::swap(*this, temp);   // Swap contents with the temporary
+    if (this != &other) {
+
+        gameState = other.gameState;
+        enPassantTargetSquare = other.enPassantTargetSquare;
+        whiteCastingAvailability = other.whiteCastingAvailability;
+        blackCastingAvailability = other.blackCastingAvailability;
+        for (const auto& pair : other.board) {
+            board[pair.first] = pair.second->clone();
+        }
+
+        /*Game temp(other); // TODO: copy-swap idiom preferred way but swap relies on `=` which causes recursion
+        std::swap(*this, temp);*/
     }
     return *this;
 }
