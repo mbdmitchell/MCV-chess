@@ -7,7 +7,7 @@
 
 class Game {
     /// STRUCTS / ENUM
-    enum GameState {IN_PROGRESS, DRAW, WHITE_WIN, BLACK_WIN};
+    enum GameState {IN_PROGRESS, DRAW, STALEMATE, WHITE_WIN, BLACK_WIN};
     struct castingAvailability {
         bool kingSide = true;
         bool queenSide = true;

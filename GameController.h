@@ -48,13 +48,18 @@ private:
 
     void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
 
-    bool isValidCastling(const Location<> &source, const Location<> &destination);
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
+
     [[nodiscard]] bool isCastlingAttempt(const Location<> &source, const Location<> &destination) const;
+    void updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source);
+
     [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
+
+    void handleRookCastlingMove(const Location<> &destination);
 
     [[nodiscard]] Game::GameState calculateGameState() const;
 
     [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
+
     [[nodiscard]] bool inCheck(const Player& player) const;
 };
