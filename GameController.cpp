@@ -95,7 +95,7 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
 }
 
-bool GameController::isValidMove(const Location<> &source, const Location<> &destination) {
+bool GameController::isValidMove(const Location<> &source, const Location<> &destination) const {
     const auto& board = game.board;
     const auto& moversColour = game.activePlayer.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
@@ -122,7 +122,7 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
     return true;
 }
 
-bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) {
+bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const {
 
     GameController copy {*this}; // store controller (inc. game state) in copy
 
@@ -139,7 +139,7 @@ bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Loca
     return returnValue;
 }
 
-Location<> GameController::getLocationOfKing(Piece::Colour kingColour) {
+Location<> GameController::getLocationOfKing(Piece::Colour kingColour) const { // TODO: pass a player, not a colour
     const auto& board = game.board.board;
     auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
         const auto& piece = entry.second;
@@ -149,7 +149,7 @@ Location<> GameController::getLocationOfKing(Piece::Colour kingColour) {
     return (it != board.end() ? it->first : Location{});
 }
 
-bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opponentsColour) {
+bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opponentsColour) const { // TODO: pass a player, not a colour
     // NB: a square isn't marked as under attack if the attacker has a piece there.
     // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
     // and you cant castle through an en passant target square, this is a moot issue
@@ -173,7 +173,7 @@ void GameController::setEnPassantTargetSquare(const Location<> &source, const Lo
     }
 }
 
-bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) {
+bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) const {
 
     if (!isCastlingAttempt(source, destination)) return false;
     // if (kingAlreadyMoved() return false;
