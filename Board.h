@@ -31,11 +31,8 @@ public:
         return board[location];
     }
     const auto& operator[](const Location<>& location) const {
-        // Check if 'index' exists in the 'board' before accessing it.
         if (board.find(location) == board.end()) {
-            // Handle the case where 'index' does not exist, e.g., by throwing an exception or returning a default value.
-            // You need to decide what's appropriate for your use case.
-            throw std::out_of_range("Location not found in board");
+            throw std::out_of_range("Location not found in board"); // TODO: is std::out_of_range right? (std::runtime_error)
         }
         return board.at(location);
     }
