@@ -31,3 +31,13 @@ Game &Game::operator=(const Game &other) {
     }
     return *this;
 }
+
+std::string Game::gameStateAsString(Game::GameState gs) {
+    switch (gs) {
+        case GameState::WHITE_WIN: return "White Wins";
+        case GameState::BLACK_WIN: return "Black Wins";
+        case GameState::DRAW: return "Draw";
+        case GameState::STALEMATE: return "Draw by Stalemate";
+        case GameState::IN_PROGRESS: return "Game In Progress";
+    }
+}

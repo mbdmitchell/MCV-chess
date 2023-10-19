@@ -7,7 +7,9 @@
 
 class Game {
     /// STRUCTS / ENUM
+public:
     enum GameState {IN_PROGRESS, DRAW, STALEMATE, WHITE_WIN, BLACK_WIN};
+private:
     struct castingAvailability {
         bool kingSide = true;
         bool queenSide = true;
@@ -31,5 +33,6 @@ public:
     Game() = default;
     Game(const Game& other);
     Game& operator=(const Game& other);
+    static std::string gameStateAsString(GameState gs);
 };
 
