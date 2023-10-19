@@ -9,6 +9,7 @@ Game::Game(const Game &other)
         , enPassantTargetSquare{other.enPassantTargetSquare}
         , whiteCastingAvailability{other.whiteCastingAvailability}
         , blackCastingAvailability{other.blackCastingAvailability}
+        , activePlayer{other.activePlayer}
 {
     for (const auto& pair : other.board) {
         board[pair.first] = pair.second->clone();
@@ -25,7 +26,6 @@ Game &Game::operator=(const Game &other) {
         for (const auto& pair : other.board) {
             board[pair.first] = pair.second->clone();
         }
-
         /*Game temp(other); // TODO: copy-swap idiom preferred way but swap relies on `=` which causes recursion
         std::swap(*this, temp);*/
     }
