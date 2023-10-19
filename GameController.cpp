@@ -8,6 +8,7 @@ void GameController::setup() {
     const auto& BLACK = Piece::Colour::BLACK;
     const auto& WHITE = Piece::Colour::WHITE;
     auto& board = game.board;
+
     // PAWNS
     for (Location location{"A2"}; location <= Location{"H2"}; ++location) {
         board.insert(location, std::make_unique<Pawn>(WHITE));
@@ -163,11 +164,10 @@ bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opp
     // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
     // and you cant castle through an en passant target square, this is a moot issue
     const auto& board = game.board.board;
-
     auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
         const auto& [source, sourcePiece] = it;
         if (sourcePiece.get()->getColour() != opponentsColour) return false;
-        return GameController::isValidMove(source, target);
+        return isValidMove(opponentsColour, source, target);
     };
 
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
@@ -185,7 +185,6 @@ void GameController::setEnPassantTargetSquare(const Location<> &source, const Lo
 bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) const {
 
     if (!isCastlingAttempt(source, destination)) return false;
-    // if (kingAlreadyMoved() return false;
 
     if (destination == Location{"C1"}) {
         return game.whiteCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B1"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
@@ -273,8 +272,7 @@ Game::GameState GameController::calculateGameState() const {
     else {
         //const auto& activePlayerColour = game.activePlayer.getColour();
         //const auto opposingPlayerColour = activePlayerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
-        if (inCheck(game.activePlayer)) { // TODO: Test inCheck()
-        //if (isUnderAttackBy(getLocationOfKing(activePlayerColour),opposingPlayerColour)) {
+        if (inCheck(game.activePlayer)) {
             return game.activePlayer.getColour() == Piece::Colour::WHITE ? Game::GameState::BLACK_WIN : Game::GameState::WHITE_WIN;
         }
         else {
