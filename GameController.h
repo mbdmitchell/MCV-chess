@@ -16,7 +16,7 @@ public:
     GameController() = default;
     GameController(const GameController& rhs)
         : game{rhs.game}, gameView{std::make_unique<GameViewCLI>()} { } // Change if implementing other `GameView`s
-    GameController& operator=(const GameController& rhs){
+    GameController& operator=(const GameController& rhs) {
         gameView = std::make_unique<GameViewCLI>();
         game.board.board.clear(); // bug fix for moveLeavesMoverInCheck() where `*this = copy` didn't remove the moved piece
         game = rhs.game;
@@ -31,14 +31,17 @@ public:
 /// MISC.
 public:
     void setup();
+    void manualSetup();
+    void setupSimple(); // TODO: remove from public API
     void displayBoard() const;
     void submitMove(const Location<> &source, const Location<> &destination);
+    void initGameLoop();
 private:
     void makeMove(const Location<> &source, const Location<> &destination);
 
     void swapActivePlayer();
 
-    [[nodiscard]] bool isValidMove(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool isValidMove(Piece::Colour playerColour, const Location<> &source, const Location<> &destination) const;
 
     [[nodiscard]] bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const;
 
@@ -51,7 +54,7 @@ private:
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
 
     [[nodiscard]] bool isCastlingAttempt(const Location<> &source, const Location<> &destination) const;
-    void updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source);
+    void updateCastingAvailability(gsl::not_null<Piece*> pieceMoved, const Location<> &source);
 
     [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
 

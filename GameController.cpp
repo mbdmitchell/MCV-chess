@@ -42,6 +42,16 @@ void GameController::setup() {
     board.insert(Location{"E8"}, std::make_unique<King>(BLACK));
 }
 
+void GameController::setupSimple() {
+    /// For debugging
+    const auto& BLACK = Piece::Colour::BLACK;
+    const auto& WHITE = Piece::Colour::WHITE;
+    auto& board = game.board;
+    board.insert(Location{"C2"}, std::make_unique<Queen>(WHITE));
+    board.insert(Location{"H1"}, std::make_unique<King>(BLACK));
+    board.insert(Location{"C3"}, std::make_unique<King>(WHITE));
+}
+
 void GameController::displayBoard() const {
     gameView->viewBoard(game.board);
 }
@@ -76,8 +86,9 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
 }
 
 void GameController::submitMove(const Location<> &source, const Location<> &destination) {
-    // validation
-    if (!isValidMove(source, destination)) return;
+
+    // pre-move validation <- todo: make one function to call both
+    if (!isValidMove(game.activePlayer.getColour(), source, destination)) return;
     if (moveLeavesMoverInCheck(source, destination)) return;
 
     const std::unique_ptr<Piece> pieceMoved = game.board.pieceAt(source)->clone(); // now we know it's valid we're safe to assign pieceMoved
@@ -95,9 +106,9 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
 }
 
-bool GameController::isValidMove(const Location<> &source, const Location<> &destination) const {
+bool GameController::isValidMove(Piece::Colour playerColour, const Location<> &source, const Location<> &destination) const {
     const auto& board = game.board;
-    const auto& moversColour = game.activePlayer.getColour();
+    const auto& moversColour = playerColour;
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
 
     // universal conditions
@@ -124,18 +135,16 @@ bool GameController::isValidMove(const Location<> &source, const Location<> &des
 
 bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const {
 
-    GameController copy {*this}; // store controller (inc. game state) in copy
+    GameController copy {*this};
 
-    const auto& moverColour = game.activePlayer.getColour();
+    const auto& moverColour = copy.game.activePlayer.getColour();
     const auto& opponentColour = moverColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
 
-    makeMove(source, destination);
-    swapActivePlayer(); // must be done manually as move not handled through submitMove()
+    copy.makeMove(source, destination);
+    bool returnValue = copy.inCheck(copy.game.activePlayer);
 
-    bool returnValue = isUnderAttackBy(getLocationOfKing(moverColour),opponentColour);
-    swapActivePlayer(); // TODO: this bug fix makes me sad... (without this line, moveLeavesMoverInCheck had side-effect of swapping the game.activePlayer)
+    copy.swapActivePlayer(); // TODO: [NB: not true since added "copy."?] this bug fix makes me sad... (without this line, moveLeavesMoverInCheck had side-effect of swapping game.activePlayer)
 
-    *this = copy;
     return returnValue;
 }
 
@@ -191,7 +200,7 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
     return false;
 }
 
-bool GameController::isCastlingAttempt(const Location<> &source, const Location<> &destination) {
+bool GameController::isCastlingAttempt(const Location<> &source, const Location<> &destination) const {
     const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
     if ((dynamic_cast<King*>(game.board.pieceAt(source)) != nullptr)
         || rowDifference != 0
@@ -277,9 +286,13 @@ Game::GameState GameController::calculateGameState() const {
 bool GameController::thereExistsValidMove(const Player& activePlayer) const {
     GameController copy {*this};
     for (const auto& [source, piece] : copy.game.board) {
-        if (piece->getColour() != activePlayer.getColour()) continue;
+        if (piece->getColour() != copy.game.activePlayer.getColour()) continue;
         for (Location destination = Location{"A1"}; destination <= Location{"H8"}; ++destination) {
-            if (copy.isValidMove(source, destination) && !copy.moveLeavesMoverInCheck(source, destination)) return true;
+            if (copy.isValidMove(copy.game.activePlayer.getColour(), source, destination)
+            && !copy.moveLeavesMoverInCheck(source, destination)) {
+                return true;
+            }
+
         }
     }
     return false;
@@ -290,15 +303,77 @@ void GameController::initGameLoop() {
         displayBoard();
         std::cout << '\n';
         try {
+            const Player preMoveActivePlayer = game.activePlayer;
+            gameView->displayTurn(preMoveActivePlayer);
             submitMove(Location{gameView->readInput("Type source square: ")}, Location{gameView->readInput("Type destination square: ")});
-            game.gameState = calculateGameState();
+            if (preMoveActivePlayer != game.activePlayer) {
+                game.gameState = calculateGameState();
+            }
         }
-        catch (const std::exception& e) { gameView->logException(e); }
+        catch (const std::exception& e) {
+            gameView->logException(e);
+        }
     }
+    displayBoard();
+    gameView->endOfGameMessage(game.gameState);
 }
 
 bool GameController::inCheck(const Player& player) const {
     const Piece::Colour playerColour = player.getColour();
     const Piece::Colour opponentColour = playerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
     return isUnderAttackBy(getLocationOfKing(playerColour),opponentColour);
+}
+
+void GameController::manualSetup() {
+
+    gameView->viewBoard(game.board);
+    std::cout << '\n';
+
+    using PieceFactory = std::function<std::unique_ptr<Piece>(Piece::Colour)>;
+    std::map<char, PieceFactory> pieceFactories; // TODO: constify
+    pieceFactories['P'] = [](Piece::Colour color) { return std::make_unique<Pawn>(color); };
+    pieceFactories['B'] = [](Piece::Colour color) { return std::make_unique<Bishop>(color); };
+    pieceFactories['N'] = [](Piece::Colour color) { return std::make_unique<Knight>(color); };
+    pieceFactories['R'] = [](Piece::Colour color) { return std::make_unique<Rook>(color); };
+    pieceFactories['Q'] = [](Piece::Colour color) { return std::make_unique<Queen>(color); };
+    pieceFactories['K'] = [](Piece::Colour color) { return std::make_unique<King>(color); };
+
+    while (toupper(gameView->readInput("Add another piece? (Any key for Yes, 'N' for no): ")[0], std::locale()) != 'N') {
+
+        std::unique_ptr<Piece> selectedPiece = [&]{
+            while (true) {
+                try {
+                    const char pieceChar = gameView->readInput("Enter piece char (eg. 'K', 'k'): ")[0];
+                    const char pieceCode = toupper(pieceChar, std::locale());
+                    if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
+                        if (isupper(pieceChar)) {
+                            return pieceFactories[pieceCode](Piece::Colour::WHITE);
+                        } else {
+                            return pieceFactories[pieceCode](Piece::Colour::BLACK);
+                        }
+                    }
+                    throw std::runtime_error("Invalid piece character");
+                } catch (const std::exception& e) {
+                    gameView->logException(e);
+                }
+            }
+        }();
+
+        const Location selectedLocation = [&]{
+            while (true) {
+                try {
+                    const auto location {Location{gameView->readInput("Place at location: ")}};
+                    return location;
+                }
+                catch (const std::exception& e) {
+                    gameView->logException(e);
+                }
+            }
+        }();
+
+        game.board.insert(selectedLocation, std::move(selectedPiece));
+        gameView->viewBoard(game.board);
+
+    }
+
 }
