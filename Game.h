@@ -33,6 +33,8 @@ public:
     Game() = default;
     Game(const Game& other);
     Game& operator=(const Game& other);
+
+    /// MISC.
     static std::string gameStateAsString(GameState gs);
 };
 

@@ -39,11 +39,11 @@ void GameViewCLI::viewBoard(const Board &b) const {
 
 }
 
-void GameViewCLI::logException(const std::exception &e) const {
+void GameViewCLI::displayException(const std::exception &e) const {
     std::cout << e.what() << '\n';
 }
 
-void GameViewCLI::endOfGameMessage(const Game::GameState gameState) const {
+void GameViewCLI::displayEndOfGameMessage(const Game::GameState gameState) const {
     std::cout << std::format("End of Game: {}", Game::gameStateAsString(gameState)) << '\n';
 }
 

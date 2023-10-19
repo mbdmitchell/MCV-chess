@@ -1,7 +1,3 @@
-//
-// Created by Max Mitchell on 12/10/2023.
-//
-
 #include "GameController.h"
 
 void GameController::setup() {
@@ -9,38 +5,26 @@ void GameController::setup() {
     const auto& WHITE = Piece::Colour::WHITE;
     auto& board = game.board;
 
-    // PAWNS
-    for (Location location{"A2"}; location <= Location{"H2"}; ++location) {
-        board.insert(location, std::make_unique<Pawn>(WHITE));
+    for (const auto& colour : {WHITE, BLACK}){
+
+        const std::string pawnRow = (colour == WHITE ? "2" : "7");  // NB: didn't use gsl::index as don't want to risk confusing with ACTUAL indices (1, 6 respectively)
+        const std::string pieceRow = (colour == WHITE ? "1" : "8");
+
+        for (Location location{"A" + pawnRow}; location <= Location{"H" + pawnRow}; ++location) {
+            board.insert(location, std::make_unique<Pawn>(colour));
+        }
+        for (Location location: {Location{"A" + pieceRow}, Location{"H" + pieceRow}}) {
+            board.insert(location, std::make_unique<Rook>(colour));
+        }
+        for (Location location: {Location{"B" + pieceRow}, Location{"G" + pieceRow}}) {
+            board.insert(location, std::make_unique<Knight>(colour));
+        }
+        for (Location location: {Location{"C" + pieceRow}, Location{"F" + pieceRow}}) {
+            board.insert(location, std::make_unique<Bishop>(colour));
+        }
+        board.insert(Location{"D" + pieceRow}, std::make_unique<Queen>(colour));
+        board.insert(Location{"E" + pieceRow}, std::make_unique<King>(colour));
     }
-    for (Location location{"A7"}; location <= Location{"H7"}; ++location) {
-        board.insert(location, std::make_unique<Pawn>(BLACK));
-    }
-    // ROOKS
-    for (Location location : {Location{"A1"}, Location{"H1"}}) {
-        board.insert(location, std::make_unique<Rook>(WHITE));
-    }
-    for (Location location : {Location{"A8"}, Location{"H8"}}) {
-        board.insert(location, std::make_unique<Rook>(BLACK));
-    }
-    // KNIGHTS
-    for (Location location : {Location{"B1"}, Location{"G1"}}) {
-        board.insert(location, std::make_unique<Knight>(WHITE));
-    }
-    for (Location location : {Location{"B8"}, Location{"G8"}}) {
-        board.insert(location, std::make_unique<Knight>(BLACK));
-    }
-    // BISHOPS
-    for (Location location : {Location{"C1"}, Location{"F1"}}) {
-        board.insert(location, std::make_unique<Bishop>(WHITE));
-    }
-    for (Location location : {Location{"C8"}, Location{"F8"}}) {
-        board.insert(location, std::make_unique<Bishop>(BLACK));
-    }
-    board.insert(Location{"D1"}, std::make_unique<Queen>(WHITE));
-    board.insert(Location{"D8"}, std::make_unique<Queen>(BLACK));
-    board.insert(Location{"E1"}, std::make_unique<King>(WHITE));
-    board.insert(Location{"E8"}, std::make_unique<King>(BLACK));
 }
 
 void GameController::setupSimple() {
@@ -51,10 +35,6 @@ void GameController::setupSimple() {
     board.insert(Location{"C2"}, std::make_unique<Queen>(WHITE));
     board.insert(Location{"H1"}, std::make_unique<King>(BLACK));
     board.insert(Location{"C3"}, std::make_unique<King>(WHITE));
-}
-
-void GameController::displayBoard() const {
-    gameView->viewBoard(game.board);
 }
 
 void GameController::makeMove(const Location<> &source, const Location<> &destination) {
@@ -137,20 +117,15 @@ bool GameController::isValidMove(Piece::Colour playerColour, const Location<> &s
 bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const {
 
     GameController copy {*this};
-
-    const auto& moverColour = copy.game.activePlayer.getColour();
-    const auto& opponentColour = moverColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
-
     copy.makeMove(source, destination);
     bool returnValue = copy.inCheck(copy.game.activePlayer);
-
-    copy.swapActivePlayer(); // TODO: [NB: not true since added "copy."?] this bug fix makes me sad... (without this line, moveLeavesMoverInCheck had side-effect of swapping game.activePlayer)
 
     return returnValue;
 }
 
 Location<> GameController::getLocationOfKing(Piece::Colour kingColour) const { // TODO: pass a player, not a colour
     const auto& board = game.board.board;
+
     auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
         const auto& piece = entry.second;
         return (piece->getColour() == kingColour) && (dynamic_cast<King*>(piece.get()) != nullptr);
@@ -214,11 +189,11 @@ bool GameController::isCastlingAttempt(const Location<> &source, const Location<
 void GameController::updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source) {
     if (dynamic_cast<const King*>(pieceMoved.get()) != nullptr) { // if pieceMoved's type == King
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
-            game.whiteCastingAvailability = {false, false};
+            game.whiteCastingAvailability = { false, false };
         } else {
             game.blackCastingAvailability = { false, false };
         }
-    } else if (dynamic_cast<const Rook*>(pieceMoved.get()) != nullptr) { // todo: remove `!=/== nullptr` throughout. (if you want to keep the bool "look", `static_cast<bool>(dynamic_cast...)`
+    } else if (dynamic_cast<const Rook*>(pieceMoved.get()) != nullptr) { // todo: remove `!=/== nullptr` throughout
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             if (source == Location("A1")) {
                 game.whiteCastingAvailability.queenSide = false;
@@ -284,9 +259,9 @@ Game::GameState GameController::calculateGameState() const {
 bool GameController::thereExistsValidMove(const Player& activePlayer) const {
     GameController copy {*this};
     for (const auto& [source, piece] : copy.game.board) {
-        if (piece->getColour() != copy.game.activePlayer.getColour()) continue;
+        if (piece->getColour() != activePlayer.getColour()) continue;
         for (Location destination = Location{"A1"}; destination <= Location{"H8"}; ++destination) {
-            if (copy.isValidMove(copy.game.activePlayer.getColour(), source, destination)
+            if (copy.isValidMove(activePlayer.getColour(), source, destination)
             && !copy.moveLeavesMoverInCheck(source, destination)) {
                 return true;
             }
@@ -298,7 +273,7 @@ bool GameController::thereExistsValidMove(const Player& activePlayer) const {
 
 void GameController::initGameLoop() {
     while (game.gameState == Game::GameState::IN_PROGRESS){
-        displayBoard();
+        gameView->viewBoard(game.board);
         std::cout << '\n';
         try {
             const Player preMoveActivePlayer = game.activePlayer;
@@ -309,11 +284,11 @@ void GameController::initGameLoop() {
             }
         }
         catch (const std::exception& e) {
-            gameView->logException(e);
+            gameView->displayException(e);
         }
     }
-    displayBoard();
-    gameView->endOfGameMessage(game.gameState);
+    gameView->viewBoard(game.board);
+    gameView->displayEndOfGameMessage(game.gameState);
 }
 
 bool GameController::inCheck(const Player& player) const {
@@ -327,15 +302,6 @@ void GameController::manualSetup() {
     gameView->viewBoard(game.board);
     std::cout << '\n';
 
-    using PieceFactory = std::function<std::unique_ptr<Piece>(Piece::Colour)>;
-    std::map<char, PieceFactory> pieceFactories; // TODO: constify
-    pieceFactories['P'] = [](Piece::Colour color) { return std::make_unique<Pawn>(color); };
-    pieceFactories['B'] = [](Piece::Colour color) { return std::make_unique<Bishop>(color); };
-    pieceFactories['N'] = [](Piece::Colour color) { return std::make_unique<Knight>(color); };
-    pieceFactories['R'] = [](Piece::Colour color) { return std::make_unique<Rook>(color); };
-    pieceFactories['Q'] = [](Piece::Colour color) { return std::make_unique<Queen>(color); };
-    pieceFactories['K'] = [](Piece::Colour color) { return std::make_unique<King>(color); };
-
     while (toupper(gameView->readInput("Add another piece? (Any key for Yes, 'N' for no): ")[0], std::locale()) != 'N') {
 
         std::unique_ptr<Piece> selectedPiece = [&]{
@@ -345,14 +311,14 @@ void GameController::manualSetup() {
                     const char pieceCode = toupper(pieceChar, std::locale());
                     if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
                         if (isupper(pieceChar)) {
-                            return pieceFactories[pieceCode](Piece::Colour::WHITE);
+                            return pieceFactories.at(pieceCode)(Piece::Colour::WHITE);
                         } else {
-                            return pieceFactories[pieceCode](Piece::Colour::BLACK);
+                            return pieceFactories.at(pieceCode)(Piece::Colour::BLACK);
                         }
                     }
                     throw std::runtime_error("Invalid piece character");
                 } catch (const std::exception& e) {
-                    gameView->logException(e);
+                    gameView->displayException(e);
                 }
             }
         }();
@@ -364,7 +330,7 @@ void GameController::manualSetup() {
                     return location;
                 }
                 catch (const std::exception& e) {
-                    gameView->logException(e);
+                    gameView->displayException(e);
                 }
             }
         }();
@@ -375,3 +341,26 @@ void GameController::manualSetup() {
     }
 
 }
+
+GameController::GameController(const GameController &rhs)
+        : game{rhs.game}, gameView{std::make_unique<GameViewCLI>()} { }
+
+GameController &GameController::operator=(const GameController &rhs) {
+    gameView = std::make_unique<GameViewCLI>();
+    game.board.board.clear(); // bug fix for moveLeavesMoverInCheck() where `*this = copy` didn't remove the moved piece
+    game = rhs.game;
+    return *this;
+}
+
+std::map<char, PieceFactory> GameController::createPieceFactories() {
+    std::map<char, PieceFactory> temp;
+    temp['P'] = [](Piece::Colour color) { return std::make_unique<Pawn>(color); };
+    temp['B'] = [](Piece::Colour color) { return std::make_unique<Bishop>(color); };
+    temp['N'] = [](Piece::Colour color) { return std::make_unique<Knight>(color); };
+    temp['R'] = [](Piece::Colour color) { return std::make_unique<Rook>(color); };
+    temp['Q'] = [](Piece::Colour color) { return std::make_unique<Queen>(color); };
+    temp['K'] = [](Piece::Colour color) { return std::make_unique<King>(color); };
+    return temp;
+}
+
+const std::map<char, PieceFactory> GameController::pieceFactories = createPieceFactories();

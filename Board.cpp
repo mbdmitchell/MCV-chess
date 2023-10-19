@@ -7,19 +7,7 @@
 bool Board::isPathBlocked(const Location<> &source, const Location<> &destination) const {
 
     const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    const auto minimalDistanceMoveForGivenDirection = std::invoke([&] { // TODO: I know its only called once but may be clearer as member function?
-        const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
-        if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
-            return Location<>::RowColumnDifferences {0, 0};
-        } else if (totalChangeInRow == 0) {
-            return Location<>::RowColumnDifferences {0, totalChangeInColumn/abs(totalChangeInColumn)};
-        } else if (totalChangeInColumn == 0) {
-            return Location<>::RowColumnDifferences {totalChangeInRow / abs(totalChangeInRow), 0};
-        } else {
-            auto gcd = std::gcd(abs(totalChangeInRow), abs(totalChangeInColumn));
-            return Location<>::RowColumnDifferences {totalChangeInRow / gcd, totalChangeInColumn / gcd};
-        }
-    });
+    const auto minimalDistanceMoveForGivenDirection = calculateMinimalDistanceMoveForGivenDirection(totalRowColumnDifferences);
 
     auto toNextSquare = [](const Location<>& location, const Location<>::RowColumnDifferences& minimal) -> Location<> {
         const auto& [row, column] = location;
@@ -58,4 +46,19 @@ void Board::erase(const Location<> &location) {
 
 void Board::insert(const Location<> &location, std::unique_ptr<Piece> piece) {
     board.insert({location,std::move(piece)});
+}
+
+Location<>::RowColumnDifferences Board::calculateMinimalDistanceMoveForGivenDirection(
+        const Location<>::RowColumnDifferences &totalRowColumnDifferences) {
+    const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
+    if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
+        return Location<>::RowColumnDifferences {0, 0};
+    } else if (totalChangeInRow == 0) {
+        return Location<>::RowColumnDifferences {0, totalChangeInColumn/abs(totalChangeInColumn)};
+    } else if (totalChangeInColumn == 0) {
+        return Location<>::RowColumnDifferences {totalChangeInRow / abs(totalChangeInRow), 0};
+    } else {
+        auto gcd = std::gcd(abs(totalChangeInRow), abs(totalChangeInColumn));
+        return Location<>::RowColumnDifferences {totalChangeInRow / gcd, totalChangeInColumn / gcd};
+    }
 }

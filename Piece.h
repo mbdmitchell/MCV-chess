@@ -40,6 +40,7 @@ public:
 
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
+
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location<> &source,
                                        const Location<> &destination,
