@@ -88,7 +88,7 @@ public:
         }
     }
 
-    std::strong_ordering operator<=>(const Location& other) const {
+    std::strong_ordering operator<=>(const Location& other) const { // TODO: try getting it working as `auto operator<=>(const Location& other) = default;` instead
         if (boardRowIndex < other.boardRowIndex){
             return std::strong_ordering::less;
         }
@@ -108,7 +108,7 @@ public:
         }
     }
 
-    bool operator==(const Location& other) const {
+    bool operator==(const Location& other) const { // TODO: try getting it working as `auto operator<=>(const Location& other) = default;` instead
         return (boardRowIndex == other.boardRowIndex
                 && boardColumnIndex == other.boardColumnIndex);
     }
