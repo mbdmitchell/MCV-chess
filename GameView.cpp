@@ -32,7 +32,7 @@ void GameViewCLI::viewBoard(const Board &b) const {
 
     const auto& board = b.board;
 
-    for (gsl::index row = Location<>::getMaxRowIndex(); row != std::numeric_limits<size_t>::max(); --row) {
+    for (gsl::index row = Location<>::getMaxRowIndex(); row >= 0; --row) {
         for (Location location {row,0}; location <= Location{row,Location<>::getMaxColumnIndex()}; ++location) {
 
             if (board.contains(location)) {
@@ -54,4 +54,13 @@ void GameViewCLI::viewBoard(const Board &b) const {
 
 void GameViewCLI::logException(const std::exception &e) const {
     std::cout << e.what() << '\n';
+}
+
+void GameViewCLI::endOfGameMessage(const Game::GameState gameState) const {
+    std::cout << std::format("End of Game: {}", Game::gameStateAsString(gameState)) << '\n';
+}
+
+void GameViewCLI::displayTurn(const Player &player) const {
+    std::string colourString = (player.getColour() == Piece::Colour::WHITE ? "White" : "Black");
+    std::cout << std::format("{}'s turn\n", colourString);
 }
