@@ -41,3 +41,19 @@ std::string Game::gameStateAsString(Game::GameState gs) {
         case GameState::IN_PROGRESS: return "Game In Progress";
     }
 }
+
+Player Game::getPlayerWithColour(Piece::Colour colour) const {
+    return (colour == Piece::Colour::WHITE) ? player1 : player2;
+}
+
+bool Game::isValidPromotionPiece(const Piece *&promotionPiece, const Player &player) {
+    if (promotionPiece == nullptr) return false;
+
+    if (dynamic_cast<const King*>(promotionPiece) != nullptr
+        || dynamic_cast<const Pawn*>(promotionPiece) != nullptr
+        || promotionPiece->getColour() != player.getColour()) {
+        return false;
+    }
+
+    return true;
+}

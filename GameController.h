@@ -41,7 +41,7 @@ public:
 private:
 
     /// VALIDATION
-    [[nodiscard]] bool isValidMove(Player player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
+    [[nodiscard]] bool isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
     [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
     /// MOVE TYPE

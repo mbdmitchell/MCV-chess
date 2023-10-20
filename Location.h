@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
 
 #include <string>
@@ -44,7 +46,6 @@ public:
     Location(gsl::index row, gsl::index col);
     explicit Location(std::string_view str); // Chess notation -> Coordinates (eg. "A2" -> 1,0 )
 
-
     /// GETTERS
 
     [[nodiscard]] static constexpr gsl::index getMaxColumnIndex() { return maxColumnIndex; }
@@ -64,7 +65,7 @@ public:
     bool operator==(const Location& other) const;
 
     Location& operator++();
-    Location operator++(int);
+    const Location operator++(int);
 
     /// VALIDATION
 private:
@@ -168,7 +169,7 @@ bool Location<maxRowIndex, maxColumnIndex>::isValid() const {
 }
 
 template<gsl::index maxRowIndex, gsl::index maxColumnIndex>
-Location<maxRowIndex, maxColumnIndex> Location<maxRowIndex, maxColumnIndex>::operator++(int) { // (obj++)
+const Location<maxRowIndex, maxColumnIndex> Location<maxRowIndex, maxColumnIndex>::operator++(int) { // (obj++)
     Location copy {*this};
     ++(*this);
     return copy;
@@ -247,3 +248,4 @@ Location<maxRowIndex, maxColumnIndex>::Location(gsl::index row, gsl::index col) 
         throw std::invalid_argument("Invalid Argument passed into Location(gsl::index row, gsl::index col)");
     }
 }
+#pragma clang diagnostic pop

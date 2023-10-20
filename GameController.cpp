@@ -88,7 +88,7 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
 }
 
-bool GameController::isValidMove(Player player, const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) const {
+bool GameController::isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) const {
     const auto& board = game.board;
     const auto& moversColour = player.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant

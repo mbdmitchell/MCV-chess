@@ -36,20 +36,8 @@ public:
 
     /// MISC.
     static std::string gameStateAsString(GameState gs);
-    Player getPlayerWithColour(Piece::Colour colour) const {
-        return (colour == Piece::Colour::WHITE) ? player1 : player2;
-    }
+    [[nodiscard]] Player getPlayerWithColour(Piece::Colour colour) const;
 private:
-    [[nodiscard]] static bool isValidPromotionPiece(const Piece*& promotionPiece, const Player& player) {
-        if (promotionPiece == nullptr) return false;
-
-        if (dynamic_cast<const King*>(promotionPiece) != nullptr
-            || dynamic_cast<const Pawn*>(promotionPiece) != nullptr
-            || promotionPiece->getColour() != player.getColour()) {
-            return false;
-        }
-
-        return true;
-    }
+    [[nodiscard]] static bool isValidPromotionPiece(const Piece*& promotionPiece, const Player& player);
 };
 
