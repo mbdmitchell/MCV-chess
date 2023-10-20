@@ -56,7 +56,7 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
     }
 
     // 2. castling
-    if (isCastlingAttempt(source, destination)) {
+    if (King::isValidCastlingPath(source, destination)) {
         handleRookCastlingMove(destination);
         return;
     }
@@ -106,13 +106,12 @@ bool GameController::isValidMove(Player player, const Location<> &source, const 
     // piece-dependant conditions
 
     // castling
-    if (isCastlingAttempt(source, destination) && !isValidCastling(source, destination)) {
+    if (King::isValidCastlingPath(source, destination) && !isValidCastling(source, destination)) {
         return false;
     }
 
     // pawn promotion
-    // if pawn move to back row ...
-    if (dynamic_cast<const Pawn*>(board.pieceAt(source)) && isBackRow(destination, player)) {
+    if (dynamic_cast<const Pawn*>(board.pieceAt(source)) && isBackRow(destination, player)) { // if (pawn moves to back row) ...
         return Game::isValidPromotionPiece(promotionPiece, player);
     }
 
@@ -164,7 +163,7 @@ void GameController::setEnPassantTargetSquare(const Location<> &source, const Lo
 
 bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) const {
 
-    if (!isCastlingAttempt(source, destination)) return false;
+    if (!King::isValidCastlingPath(source, destination)) return false;
 
     if (destination == Location{"C1"}) {
         return game.whiteCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B1"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
@@ -177,16 +176,6 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
     }
 
     return false;
-}
-
-// TODO: move to King class
-bool GameController::isCastlingAttempt(const Location<> &source, const Location<> &destination) const {
-    const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
-    return (
-         ((dynamic_cast<King*>(game.board.pieceAt(source)) != nullptr)
-            && rowDifference == 0
-            && abs(columnDifference) == 2
-            && (source == Location{"E1"} || source == Location{"E8"})));
 }
 
 void GameController::updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source) {
@@ -243,13 +232,12 @@ void GameController::handleRookCastlingMove(const Location<> &destination) {
 
 Game::GameState GameController::calculateGameState() const {
     if (thereExistsValidMove(game.activePlayer)) {
+        // todo: implement additional draw conditions
         /*if (isDrawByInsufficientMaterial() || isThreeFoldRepetition() || isFiftyMoveRule())
             return GameState::DRAW*/
         return Game::GameState::IN_PROGRESS;
     }
     else {
-        //const auto& activePlayerColour = game.activePlayer.getColour();
-        //const auto opposingPlayerColour = activePlayerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
         if (inCheck(game.activePlayer)) {
             return game.activePlayer.getColour() == Piece::Colour::WHITE ? Game::GameState::BLACK_WIN : Game::GameState::WHITE_WIN;
         }

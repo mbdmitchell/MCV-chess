@@ -45,8 +45,7 @@ private:
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
     [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
     /// MOVE TYPE
-    [[nodiscard]] bool isCastlingAttempt(const Location<> &source, const Location<> &destination) const;
-    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const; // TODO: move to Pawn::isEnPassant()
 
     /// CHECK
     [[nodiscard]] bool inCheck(const Player& player) const;

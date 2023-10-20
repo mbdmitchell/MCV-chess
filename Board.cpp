@@ -33,7 +33,7 @@ bool Board::thereExistsPieceAt(const Location<> &location) const {
     return board.contains(location);
 }
 
-Piece *Board::pieceAt(const Location<> &location) const {
+Piece* Board::pieceAt(const Location<> &location) const {
     if (!board.contains(location)) {
         return nullptr;
     }
