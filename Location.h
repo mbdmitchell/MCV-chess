@@ -69,7 +69,6 @@ public:
     /// VALIDATION
 private:
     [[nodiscard]] bool isValid() const;
-
     /// LOCATION-to-LOCATION RELATIONSHIP FUNCTIONS
 private:
     [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Indices& indices);

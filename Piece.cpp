@@ -145,13 +145,19 @@ King::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
+[[nodiscard]] bool King::isValidCastlingPath(const Location<>& source, const Location<>& destination) {
+    const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
+    return ((rowDifference == 0
+             && abs(columnDifference) == 2
+             && (source == Location{"E1"} || source == Location{"E8"})));
+}
 bool King::isValidMovePath(const Location<> &source,
                            const Location<> &destination,
                            const Location<> &enPassantTargetSquare,
                            bool isCapture) const {
 
     const auto& [rowDiff, colDiff] = Location<>::calculateRowColumnDifferences(source, destination);
-    return std::max(abs(rowDiff), abs(colDiff)) == 1 || (rowDiff == 0 && abs(colDiff) == 2);
+    return std::max(abs(rowDiff), abs(colDiff)) == 1 || isValidCastlingPath(source, destination);
 }
 
 std::unique_ptr<Piece> King::clone() const {

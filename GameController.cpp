@@ -32,12 +32,14 @@ void GameController::setupSimple() {
     const auto& BLACK = Piece::Colour::BLACK;
     const auto& WHITE = Piece::Colour::WHITE;
     auto& board = game.board;
-    board.insert(Location{"C2"}, std::make_unique<Queen>(WHITE));
-    board.insert(Location{"H1"}, std::make_unique<King>(BLACK));
-    board.insert(Location{"C3"}, std::make_unique<King>(WHITE));
+    board.insert(Location{"H7"}, std::make_unique<Pawn>(WHITE));
+    board.insert(Location{"H2"}, std::make_unique<Pawn>(BLACK));
+    board.insert(Location{"A3"}, std::make_unique<King>(WHITE));
+    board.insert(Location{"D2"}, std::make_unique<Knight>(WHITE));
+    board.insert(Location{"A1"}, std::make_unique<King>(BLACK));
 }
 
-void GameController::makeMove(const Location<> &source, const Location<> &destination) {
+void GameController::makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) {
 
     Board& board = game.board;
 
@@ -59,23 +61,22 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
         return;
     }
 
-    /*
     // 3. pawn promotion
-    if (const int DESTINATION_ROW = DESTINATION.getRow(); MOVING_PAWN && (DESTINATION_ROW == 0 || DESTINATION_ROW == 7)){
-        board.addPiece(DESTINATION, move.getPromotionPiece());
-    }*/
+    if (promotionPiece == nullptr) return;
+    board.erase(destination); // erase pawn at back row
+    board.insert(destination, promotionPiece->clone());
 }
 
-void GameController::submitMove(const Location<> &source, const Location<> &destination) {
+void GameController::submitMove(const Location<> &source, const Location<> &destination, const Piece* const promotionPiece = nullptr) {
 
     // pre-move validation <- todo: make one function to call both
-    if (!isValidMove(game.activePlayer.getColour(), source, destination)) return;
+    if (!isValidMove(game.activePlayer, source, destination, promotionPiece)) return;
     if (moveLeavesMoverInCheck(source, destination)) return;
 
     const std::unique_ptr<Piece> pieceMoved = game.board.pieceAt(source)->clone(); // now we know it's valid we're safe to assign pieceMoved
 
     // move
-    makeMove(source, destination);
+    makeMove(source, destination, promotionPiece);
 
     // post-move things that need sorting
     updateCastingAvailability(pieceMoved.get(), source);
@@ -87,9 +88,9 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
 }
 
-bool GameController::isValidMove(Piece::Colour playerColour, const Location<> &source, const Location<> &destination) const {
+bool GameController::isValidMove(Player player, const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) const {
     const auto& board = game.board;
-    const auto& moversColour = playerColour;
+    const auto& moversColour = player.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
 
     // universal conditions
@@ -109,9 +110,13 @@ bool GameController::isValidMove(Piece::Colour playerColour, const Location<> &s
         return false;
     }
 
-    // TODO: pawn promotion
+    // pawn promotion
+    // if pawn move to back row ...
+    if (dynamic_cast<const Pawn*>(board.pieceAt(source)) && isBackRow(destination, player)) {
+        return Game::isValidPromotionPiece(promotionPiece, player);
+    }
 
-    return true;
+    return promotionPiece == nullptr;
 }
 
 bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const {
@@ -142,7 +147,7 @@ bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opp
     auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
         const auto& [source, sourcePiece] = it;
         if (sourcePiece.get()->getColour() != opponentsColour) return false;
-        return isValidMove(opponentsColour, source, target);
+        return isValidMove(game.getPlayerWithColour(opponentsColour), source, target);
     };
 
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
@@ -174,16 +179,14 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
     return false;
 }
 
+// TODO: move to King class
 bool GameController::isCastlingAttempt(const Location<> &source, const Location<> &destination) const {
     const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
-    if ((dynamic_cast<King*>(game.board.pieceAt(source)) != nullptr)
-        || rowDifference != 0
-        || abs(columnDifference) != 2
-        || (!(source == Location{"E1"} || source == Location{"E8"})))
-    {
-        return false;
-    }
-    return true;
+    return (
+         ((dynamic_cast<King*>(game.board.pieceAt(source)) != nullptr)
+            && rowDifference == 0
+            && abs(columnDifference) == 2
+            && (source == Location{"E1"} || source == Location{"E8"})));
 }
 
 void GameController::updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source) {
@@ -261,7 +264,7 @@ bool GameController::thereExistsValidMove(const Player& activePlayer) const {
     for (const auto& [source, piece] : copy.game.board) {
         if (piece->getColour() != activePlayer.getColour()) continue;
         for (Location destination = Location{"A1"}; destination <= Location{"H8"}; ++destination) {
-            if (copy.isValidMove(activePlayer.getColour(), source, destination)
+            if (copy.isValidMove(activePlayer, source, destination)
             && !copy.moveLeavesMoverInCheck(source, destination)) {
                 return true;
             }
@@ -272,13 +275,35 @@ bool GameController::thereExistsValidMove(const Player& activePlayer) const {
 }
 
 void GameController::initGameLoop() {
-    while (game.gameState == Game::GameState::IN_PROGRESS){
+    while (game.gameState == Game::GameState::IN_PROGRESS) {
+
         gameView->viewBoard(game.board);
-        std::cout << '\n';
+        std::cout << '\n'; // TODO: no std::cout! handle with gameView
+
         try {
             const Player preMoveActivePlayer = game.activePlayer;
             gameView->displayTurn(preMoveActivePlayer);
-            submitMove(Location{gameView->readInput("Type source square: ")}, Location{gameView->readInput("Type destination square: ")});
+
+            const auto source = Location{gameView->readInput("Type source square: ")};
+            const auto destination = Location{gameView->readInput("Type destination square: ")};
+
+            auto promotionPiece = std::invoke([&]() -> std::unique_ptr<Piece> {
+                if (dynamic_cast<Pawn*>(game.board.pieceAt(source)) == nullptr || !isBackRow(destination, preMoveActivePlayer)) {
+                    return nullptr;
+                }
+                while (true) {
+                    const char pieceChar = gameView->readInput("Enter promotion piece char (eg. 'Q', 'R'): ")[0];
+                    const char pieceCode = toupper(pieceChar, std::locale());
+                    if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
+                        return pieceFactories.at(pieceCode)(preMoveActivePlayer.getColour());
+                    } else {
+                        gameView->displayException(std::runtime_error("Entered invalid char"));
+                        std::cout << '\n'; // TODO: no std::cout! handle with gameView
+                    }
+                }
+            });
+
+            submitMove(source, destination, promotionPiece.get());
             if (preMoveActivePlayer != game.activePlayer) {
                 game.gameState = calculateGameState();
             }
@@ -364,3 +389,10 @@ std::map<char, PieceFactory> GameController::createPieceFactories() {
 }
 
 const std::map<char, PieceFactory> GameController::pieceFactories = createPieceFactories();
+
+bool GameController::isBackRow(const Location<> &square, const Player &player) {
+    if (player.getColour() == Piece::Colour::WHITE) {
+        return square.getBoardRowIndex() == Location<>::getMaxRowIndex();
+    }
+    return square.getBoardRowIndex() == 0;
+}

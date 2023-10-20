@@ -134,7 +134,7 @@ public:
                                        const Location<> &destination,
                                        const Location<> &enPassantTargetSquare,
                                        bool isCapture) const override;
-
+    [[nodiscard]] static bool isValidCastlingPath(const Location<> &source, const Location<> &destination);
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
 };
