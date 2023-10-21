@@ -46,6 +46,20 @@ private:
     [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
     [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
 
+    template <typename T>
+    [[nodiscard]] static bool isType(const Piece& piece) {
+        return dynamic_cast<const T*>(&piece);
+    }
+
+    [[nodiscard]] static bool isValidPromotionPiece(const Piece* promotionPiece, const Player &player) {
+        if (promotionPiece == nullptr) return false;
+        if (isType<King>(*promotionPiece)
+            || isType<Pawn>(*promotionPiece)
+            || promotionPiece->getColour() != player.getColour()) {
+            return false;
+        }
+        return true;
+    }
     /// CHECK
     [[nodiscard]] bool inCheck(const Player& player) const;
     [[nodiscard]] bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const;

@@ -41,7 +41,5 @@ public:
     /// MISC.
     static std::string gameStateAsString(GameState gs);
     [[nodiscard]] Player getPlayerWithColour(Piece::Colour colour) const;
-private:
-    [[nodiscard]] static bool isValidPromotionPiece(const Piece*& promotionPiece, const Player& player);
 };
 

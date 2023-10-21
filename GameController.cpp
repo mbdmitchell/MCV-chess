@@ -111,8 +111,8 @@ bool GameController::isValidMove(const Player& player, const Location<> &source,
     }
 
     // pawn promotion
-    if (dynamic_cast<const Pawn*>(board.pieceAt(source)) && isBackRow(destination, player)) { // if (pawn moves to back row) ...
-        return Game::isValidPromotionPiece(promotionPiece, player);
+    if (isType<Pawn>(*board.pieceAt(source)) && isBackRow(destination, player)) { // if (pawn moves to back row) ...
+        return isValidPromotionPiece(promotionPiece, player);
     }
 
     return promotionPiece == nullptr;
@@ -132,7 +132,7 @@ Location<> GameController::getLocationOfKing(Piece::Colour kingColour) const { /
 
     auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
         const auto& piece = entry.second;
-        return (piece->getColour() == kingColour) && (dynamic_cast<King*>(piece.get()) != nullptr);
+        return (piece->getColour() == kingColour) && (isType<King>(*piece));
     });
 
     return (it != board.end() ? it->first : Location{});
@@ -154,7 +154,7 @@ bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opp
 
 void GameController::setEnPassantTargetSquare(const Location<> &source, const Location<> &destination) {
     const Location<>::RowColumnDifferences locationDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    if (dynamic_cast<Pawn*>(game.board.pieceAt(destination)) != nullptr && abs(locationDifferences.rowDifference) == 2) {
+    if (isType<Pawn>(*game.board.pieceAt(destination)) && abs(locationDifferences.rowDifference) == 2) {
         game.enPassantTargetSquare = destination;
     } else {
         game.enPassantTargetSquare = Location{};
@@ -179,13 +179,13 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
 }
 
 void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location<> &source) {
-    if (dynamic_cast<const King*>(&pieceMoved) != nullptr) { // if pieceMoved's type == King
+    if (isType<King>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             game.whiteCastingAvailability = { false, false };
         } else {
             game.blackCastingAvailability = { false, false };
         }
-    } else if (dynamic_cast<const Rook*>(&pieceMoved) != nullptr) { // todo: remove `!=/== nullptr` throughout
+    } else if (isType<Rook>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             if (source == Location("A1")) {
                 game.whiteCastingAvailability.queenSide = false;
@@ -206,7 +206,7 @@ void GameController::updateCastingAvailability(const Piece& pieceMoved, const Lo
 bool GameController::isEnPassant(const Location<> &source, const Location<> &destination) const {
     const auto& [sourceRow, sourceColumn] = source;
     const auto& [destinationRow, destinationColumn] = destination;
-    return (dynamic_cast<Pawn*>(game.board.pieceAt(destination)) != nullptr
+    return (isType<Pawn>(*game.board.pieceAt(destination))
             && game.enPassantTargetSquare == Location<>{sourceRow.value(), destinationColumn.value()});
 }
 
@@ -348,14 +348,14 @@ Game::MoveInfo GameController::getMoveInfoFromUser() const {
     const auto destination = getLocationFromUser("Type destination square: ");
 
     auto promotionPiece = std::invoke([&]() -> std::unique_ptr<Piece> {
-        if (dynamic_cast<Pawn*>(game.board.pieceAt(source)) == nullptr || !isBackRow(destination, game.activePlayer)) {
+        if (!isType<Pawn>(*game.board.pieceAt(source)) || !isBackRow(destination, game.activePlayer)) {
             return nullptr;
         }
         while (true) {
             auto piece = getPieceFromUser("Enter promotion piece char (eg. 'Q', 'R'): ");
 
-            if (   !dynamic_cast<King*>(piece.get())
-                && !dynamic_cast<Pawn*>(piece.get())
+            if (!isType<King>(*piece)
+                && !isType<Pawn>(*piece)
                 && piece->getColour() == game.activePlayer.getColour()){
                 return piece;
             } else {
