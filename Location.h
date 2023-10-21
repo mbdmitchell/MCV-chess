@@ -88,7 +88,7 @@ private:
     [[nodiscard]] static Indices calculateIndices(const Location& source, const Location& destination);
 };
 
-    /// ... For structured bindings
+/// ... For structured bindings
 namespace std {
     // tells the compiler that Location should be treated as if it were a tuple-like structure with two elements.
     template<>
