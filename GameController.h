@@ -24,6 +24,7 @@ public:
     void setupSimple(); // TODO: remove from public API
 
     /// MISC.
+    // TODO: submitMove(...) -> submitMove(Game::MoveInfo)
     void submitMove(const Location<> &source, const Location<> &destination, const Piece* const promotionPiece);
     void initGameLoop();
     void displayAllUnderAttackBy(const Player& player) {
@@ -41,6 +42,7 @@ public:
 private:
 
     /// VALIDATION
+    // TODO: isValidMove(Player, ...) -> submitMove(Player, Game::MoveInfo)    
     [[nodiscard]] bool isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
     [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
@@ -76,6 +78,7 @@ private:
     [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 
     /// MANIPULATE GAME / BOARD
+    // TODO: makeMove(...) -> makeMove(Game::MoveInfo)
     void makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece);
 
     void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
