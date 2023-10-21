@@ -1,5 +1,5 @@
 #pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection" // silence clang warnings about unused functions as it mislabels many `is move shape` functions 
 #pragma once
 
 #include <string>
@@ -75,14 +75,15 @@ private:
     [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Indices& indices);
 public:
     [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Location& source, const Location& destination);
+    [[nodiscard]] static long long maxAbsoluteRowColumnDifference(const Location& source, const Location& destination);
 
+    ///... `is move shape` functions
     [[nodiscard]] static bool isDiagonal(const Location& source, const Location& destination);
     [[nodiscard]] static bool isHorizontal(const Location& source, const Location& destination);
     [[nodiscard]] static bool isVertical(const Location& source, const Location& destination);
     [[nodiscard]] static bool isKnightMove(const Location& source, const Location& destination);
     [[nodiscard]] static bool isForwardMove(const Location& source, const Location& destination);
-    [[nodiscard]] static long long maxAbsoluteRowColumnDifference(const Location& source, const Location& destination);
-
+    
     /// MISC.
 private:
     [[nodiscard]] static Indices calculateIndices(const Location& source, const Location& destination);
