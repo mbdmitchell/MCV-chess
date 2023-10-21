@@ -25,7 +25,7 @@ void GameViewCLI::viewBoard(const Board &b) const {
     for (gsl::index row = maxRowIndex; row >= 0; --row) { // top-left to bottom-right
         for (gsl::index col = 0; col <= maxColumnIndex; ++col) {
 
-            Location location {row, col};
+            const Location location {row, col};
 
             if (board.contains(location)) {
                 const gsl::not_null<Piece*> piece = board.at(location).get(); // not_null not strictly necessary here
