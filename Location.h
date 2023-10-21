@@ -75,7 +75,7 @@ private:
     [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Indices& indices);
 public:
     [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Location& source, const Location& destination);
-    [[nodiscard]] static long long maxAbsoluteRowColumnDifference(const Location& source, const Location& destination);
+    [[nodiscard]] static gsl::index maxAbsoluteRowColumnDifference(const Location& source, const Location& destination);
 
     ///... `is move shape` functions
     [[nodiscard]] static bool isDiagonal(const Location& source, const Location& destination);
@@ -114,7 +114,7 @@ Location<maxRowIndex, maxColumnIndex>::calculateIndices(const Location &source, 
 }
 
 template<gsl::index maxRowIndex, gsl::index maxColumnIndex>
-long long Location<maxRowIndex, maxColumnIndex>::maxAbsoluteRowColumnDifference(const Location &source,
+gsl::index Location<maxRowIndex, maxColumnIndex>::maxAbsoluteRowColumnDifference(const Location &source,
                                                                                 const Location &destination) {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return (std::max(abs(differences.columnDifference), abs(differences.rowDifference)));
