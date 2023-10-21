@@ -1,7 +1,3 @@
-//
-// Created by Max Mitchell on 11/10/2023.
-//
-
 #include "Board.h"
 
 bool Board::isPathBlocked(const Location<> &source, const Location<> &destination) const {
@@ -9,21 +5,21 @@ bool Board::isPathBlocked(const Location<> &source, const Location<> &destinatio
     const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
     const auto minimalDistanceMoveForGivenDirection = calculateMinimalDistanceMove(totalRowColumnDifferences);
 
-    auto toNextSquare = [](const Location<>& location, const Location<>::RowColumnDifferences& minimal) -> Location<> {
+    auto toNextSquare = [&minimal = minimalDistanceMoveForGivenDirection](const Location<>& location) {
         const auto& [row, column] = location;
 
         const gsl::index rSum = row.value() + minimal.rowDifference;
         const gsl::index cSum = column.value() + minimal.columnDifference;
 
-        return {rSum, cSum};
+        return Location{rSum, cSum};
     };
 
-    Location current = toNextSquare(source, minimalDistanceMoveForGivenDirection);
+    Location current = toNextSquare(source);
     while (current != destination) {
         if (thereExistsPieceAt(current)) {
             return true;
         }
-        current = toNextSquare(current, minimalDistanceMoveForGivenDirection);
+        current = toNextSquare(current);
     }
 
     return false;
