@@ -33,8 +33,9 @@ bool Pawn::isValidMovePath(const Location<> &source,
     const auto [deltaRow, deltaColumn] = Location<>::calculateRowColumnDifferences(source, destination);
 
     if (Location<>::isVertical(source, destination)) {
-        if (isCapture) return false;
-
+        if (isCapture) {
+            return false;
+        }
         if (abs(deltaRow) == 1) {
             return true;
         }
@@ -43,9 +44,7 @@ bool Pawn::isValidMovePath(const Location<> &source,
             const gsl::index startingRowIndexBlack = 6;
             return ((row == startingRowIndexWhite && getColour() == Piece::Colour::WHITE) || (row == startingRowIndexBlack && getColour() == Piece::Colour::BLACK));
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     // Location::isDiagonal(source, destination)) == true
