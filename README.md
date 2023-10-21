@@ -20,7 +20,7 @@ To build and run MCV Chess, follow these steps:
 4. Compile the source code using your preferred C++20 compiler, ensuring that the required dependencies are linked (if needed).
 5. Run the program.
    ```bash
-   ./mcv_chess
+   ./MCV-chess
    ```
 
 ## Usage
