@@ -17,10 +17,15 @@ void GameViewCLI::viewPiece(const Piece& piece) const {
 
 void GameViewCLI::viewBoard(const Board &b) const {
 
-    const auto& board = b.board;
+    const auto& board { b.board };
 
-    for (gsl::index row = Location<>::getMaxRowIndex(); row >= 0; --row) {
-        for (Location location {row,0}; location <= Location{row,Location<>::getMaxColumnIndex()}; ++location) {
+    const gsl::index maxRowIndex { Location<>::getMaxRowIndex() };
+    const gsl::index maxColumnIndex { Location<>::getMaxColumnIndex() };
+
+    for (gsl::index row = maxRowIndex; row >= 0; --row) { // top-left to bottom-right
+        for (gsl::index col = 0; col <= maxColumnIndex; ++col) {
+
+            Location location {row, col};
 
             if (board.contains(location)) {
                 const gsl::not_null<Piece*> piece = board.at(location).get(); // not_null not strictly necessary here
@@ -30,7 +35,7 @@ void GameViewCLI::viewBoard(const Board &b) const {
             }
 
             std::cout << ' ';
-            if (Location<>::getMaxColumnIndex() == location.getBoardColumnIndex()) {
+            if (location.getBoardColumnIndex() == maxColumnIndex) {
                 std::cout << '\n';
             }
 
