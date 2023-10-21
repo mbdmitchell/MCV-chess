@@ -30,5 +30,4 @@ To build and run MCV Chess, follow these steps:
 
 ## Contributing
 
-If you'd like to contribute to this project, please fork the repository, create a new branch for your feature or bug fix, make your changes, and submit a pull request for review.
-
+MCV Chess is a personal project, and I do not actively accept contributions. However, you are welcome to fork the repository and use the code as a starting point for your own projects or experiments. Feel free to explore, modify, and extend the code to suit your needs.
