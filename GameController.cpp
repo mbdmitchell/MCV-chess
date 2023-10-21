@@ -178,14 +178,14 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
     return false;
 }
 
-void GameController::updateCastingAvailability(const gsl::not_null<Piece*> pieceMoved, const Location<> &source) {
-    if (dynamic_cast<const King*>(pieceMoved.get()) != nullptr) { // if pieceMoved's type == King
+void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location<> &source) {
+    if (dynamic_cast<const King*>(&pieceMoved) != nullptr) { // if pieceMoved's type == King
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             game.whiteCastingAvailability = { false, false };
         } else {
             game.blackCastingAvailability = { false, false };
         }
-    } else if (dynamic_cast<const Rook*>(pieceMoved.get()) != nullptr) { // todo: remove `!=/== nullptr` throughout
+    } else if (dynamic_cast<const Rook*>(&pieceMoved) != nullptr) { // todo: remove `!=/== nullptr` throughout
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             if (source == Location("A1")) {
                 game.whiteCastingAvailability.queenSide = false;
