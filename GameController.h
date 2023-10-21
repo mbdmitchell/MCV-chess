@@ -69,6 +69,7 @@ private:
     /// MISC.
     static std::map<char, PieceFactory> createPieceFactories();
 
+    [[nodiscard]] Game::MoveInfo getMoveInfo() const;
 };
 
 

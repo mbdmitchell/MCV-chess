@@ -269,29 +269,13 @@ void GameController::initGameLoop() {
         std::cout << '\n'; // TODO: no std::cout! handle with gameView
 
         try {
+            gameView->displayTurn(game.activePlayer);
+
+            const auto& [source, destination, promotionPiece] = getMoveInfo();
             const Player preMoveActivePlayer = game.activePlayer;
-            gameView->displayTurn(preMoveActivePlayer);
-
-            const auto source = Location{gameView->readInput("Type source square: ")};
-            const auto destination = Location{gameView->readInput("Type destination square: ")};
-
-            auto promotionPiece = std::invoke([&]() -> std::unique_ptr<Piece> {
-                if (dynamic_cast<Pawn*>(game.board.pieceAt(source)) == nullptr || !isBackRow(destination, preMoveActivePlayer)) {
-                    return nullptr;
-                }
-                while (true) {
-                    const char pieceChar = gameView->readInput("Enter promotion piece char (eg. 'Q', 'R'): ")[0];
-                    const char pieceCode = toupper(pieceChar, std::locale());
-                    if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
-                        return pieceFactories.at(pieceCode)(preMoveActivePlayer.getColour());
-                    } else {
-                        gameView->displayException(std::runtime_error("Entered invalid char"));
-                        std::cout << '\n'; // TODO: no std::cout! handle with gameView
-                    }
-                }
-            });
 
             submitMove(source, destination, promotionPiece.get());
+            // TODO: submitMove -> bool submitMoveAndReturnSuccessStatus()??
             if (preMoveActivePlayer != game.activePlayer) {
                 game.gameState = calculateGameState();
             }
@@ -383,4 +367,27 @@ bool GameController::isBackRow(const Location<> &square, const Player &player) {
         return square.getBoardRowIndex() == Location<>::getMaxRowIndex();
     }
     return square.getBoardRowIndex() == 0;
+}
+
+Game::MoveInfo GameController::getMoveInfo() const {
+    const auto source = Location{gameView->readInput("Type source square: ")};
+    const auto destination = Location{gameView->readInput("Type destination square: ")};
+
+    auto promotionPiece = std::invoke([&]() -> std::unique_ptr<Piece> {
+        if (dynamic_cast<Pawn*>(game.board.pieceAt(source)) == nullptr || !isBackRow(destination, game.activePlayer)) {
+            return nullptr;
+        }
+        while (true) {
+            const char pieceChar = gameView->readInput("Enter promotion piece char (eg. 'Q', 'R'): ")[0];
+            const char pieceCode = toupper(pieceChar, std::locale());
+            if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
+                return pieceFactories.at(pieceCode)(game.activePlayer.getColour());
+            } else {
+                gameView->displayException(std::runtime_error("Entered invalid char"));
+                std::cout << '\n'; // TODO: no std::cout! handle with gameView
+            }
+        }
+    });
+
+    return {source, destination, std::move(promotionPiece)};
 }

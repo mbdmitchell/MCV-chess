@@ -14,7 +14,11 @@ private:
         bool kingSide = true;
         bool queenSide = true;
     };
-
+    struct MoveInfo {
+        const Location<> source;
+        const Location<> destination;
+        std::unique_ptr<Piece> promotionPiece;
+    };
     /// DATA MEMBERS
     Board board{};
     GameState gameState {IN_PROGRESS};
