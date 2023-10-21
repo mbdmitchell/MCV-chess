@@ -43,9 +43,8 @@ private:
     /// VALIDATION
     [[nodiscard]] bool isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
-    [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
-    /// MOVE TYPE
     [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const; // TODO: move to Pawn::isEnPassant()
+    [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
 
     /// CHECK
     [[nodiscard]] bool inCheck(const Player& player) const;
@@ -56,6 +55,11 @@ private:
     [[nodiscard]] Game::GameState calculateGameState() const;
     [[nodiscard]] bool isUnderAttackBy(Location<> location, const Piece::Colour& opponentsColour) const;
     [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
+
+    /// ... get from user
+    [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const;
+    [[nodiscard]] Location<> getLocationFromUser(std::string_view message) const;
+    [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 
     /// MANIPULATE GAME / BOARD
     void makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece);
@@ -69,9 +73,6 @@ private:
     /// MISC.
     static std::map<char, PieceFactory> createPieceFactories();
 
-    [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const;
-    [[nodiscard]] Location<> getLocationFromUser(std::string_view message) const;
-    [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 };
 
 
