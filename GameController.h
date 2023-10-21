@@ -65,7 +65,7 @@ private:
     void makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece);
 
     void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
-    void updateCastingAvailability(gsl::not_null<Piece*> pieceMoved, const Location<> &source);
+    void updateCastingAvailability(const Piece& pieceMoved, const Location<> &source);
     void handleRookCastlingMove(const Location<> &destination);
 
     void swapActivePlayer();

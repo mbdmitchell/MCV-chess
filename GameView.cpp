@@ -11,8 +11,8 @@ std::string GameViewCLI::readInput(std::string_view message) const {
     return input;
 }
 
-void GameViewCLI::viewPiece(const gsl::not_null<const Piece *> piece) const {
-    std::cout << static_cast<char>(*piece);
+void GameViewCLI::viewPiece(const Piece& piece) const {
+    std::cout << static_cast<char>(piece);
 }
 
 void GameViewCLI::viewBoard(const Board &b) const {
@@ -23,8 +23,8 @@ void GameViewCLI::viewBoard(const Board &b) const {
         for (Location location {row,0}; location <= Location{row,Location<>::getMaxColumnIndex()}; ++location) {
 
             if (board.contains(location)) {
-                const gsl::not_null<Piece*> piece = board.at(location).get();
-                viewPiece(piece);
+                const gsl::not_null<Piece*> piece = board.at(location).get(); // not_null not strictly necessary here
+                viewPiece(*piece);
             } else {
                 std::cout << '.';
             }

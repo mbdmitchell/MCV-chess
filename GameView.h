@@ -8,7 +8,7 @@ public:
     virtual ~GameView() = default;
 
     virtual void viewBoard(const Board& b) const = 0;
-    virtual void viewPiece(gsl::not_null<const Piece*> piece) const = 0;
+    virtual void viewPiece(const Piece& piece) const = 0;
 
     [[nodiscard]] virtual std::string readInput(std::string_view message) const = 0;
 
@@ -21,7 +21,7 @@ public:
 class GameViewCLI : public GameView {
 public:
     void viewBoard(const Board &b) const override;
-    void viewPiece(gsl::not_null<const Piece*> piece) const override;
+    void viewPiece(const Piece& piece) const override;
 
     [[nodiscard]] std::string readInput(std::string_view message) const override;
 
