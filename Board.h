@@ -49,7 +49,7 @@ public:
 
 private:
 
-    static Location<>::RowColumnDifferences calculateMinimalDistanceMoveForGivenDirection(
+    static Location<>::RowColumnDifferences calculateMinimalDistanceMove(
             const Location<>::RowColumnDifferences& totalRowColumnDifferences);
 
 };

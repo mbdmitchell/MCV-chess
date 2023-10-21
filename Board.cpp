@@ -7,7 +7,7 @@
 bool Board::isPathBlocked(const Location<> &source, const Location<> &destination) const {
 
     const auto totalRowColumnDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    const auto minimalDistanceMoveForGivenDirection = calculateMinimalDistanceMoveForGivenDirection(totalRowColumnDifferences);
+    const auto minimalDistanceMoveForGivenDirection = calculateMinimalDistanceMove(totalRowColumnDifferences);
 
     auto toNextSquare = [](const Location<>& location, const Location<>::RowColumnDifferences& minimal) -> Location<> {
         const auto& [row, column] = location;
@@ -48,8 +48,9 @@ void Board::insert(const Location<> &location, std::unique_ptr<Piece> piece) {
     board.insert({location,std::move(piece)});
 }
 
-Location<>::RowColumnDifferences Board::calculateMinimalDistanceMoveForGivenDirection(
-        const Location<>::RowColumnDifferences &totalRowColumnDifferences) {
+Location<>::RowColumnDifferences Board::calculateMinimalDistanceMove(
+        const Location<>::RowColumnDifferences &totalRowColumnDifferences)
+{
     const auto& [totalChangeInRow, totalChangeInColumn] = totalRowColumnDifferences;
     if (totalChangeInRow == 0 && totalChangeInColumn == 0) {
         return Location<>::RowColumnDifferences {0, 0};
