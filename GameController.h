@@ -43,7 +43,7 @@ private:
     /// VALIDATION
     [[nodiscard]] bool isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
-    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const; // TODO: move to Pawn::isEnPassant()
+    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
     [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
 
     /// CHECK
