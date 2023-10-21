@@ -271,7 +271,7 @@ void GameController::initGameLoop() {
         try {
             gameView->displayTurn(game.activePlayer);
 
-            const auto& [source, destination, promotionPiece] = getMoveInfo();
+            const auto& [source, destination, promotionPiece] = getMoveInfoFromUser();
             const Player preMoveActivePlayer = game.activePlayer;
 
             submitMove(source, destination, promotionPiece.get());
@@ -301,42 +301,15 @@ void GameController::manualSetup() {
 
     while (toupper(gameView->readInput("Add another piece? (Any key for Yes, 'N' for no): ")[0], std::locale()) != 'N') {
 
-        std::unique_ptr<Piece> selectedPiece = [&]{
-            while (true) {
-                try {
-                    const char pieceChar = gameView->readInput("Enter piece char (eg. 'K', 'k'): ")[0];
-                    const char pieceCode = toupper(pieceChar, std::locale());
-                    if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
-                        if (isupper(pieceChar)) {
-                            return pieceFactories.at(pieceCode)(Piece::Colour::WHITE);
-                        } else {
-                            return pieceFactories.at(pieceCode)(Piece::Colour::BLACK);
-                        }
-                    }
-                    throw std::runtime_error("Invalid piece character");
-                } catch (const std::exception& e) {
-                    gameView->displayException(e);
-                }
-            }
-        }();
-
-        const Location selectedLocation = [&]{
-            while (true) {
-                try {
-                    const auto location {Location{gameView->readInput("Place at location: ")}};
-                    return location;
-                }
-                catch (const std::exception& e) {
-                    gameView->displayException(e);
-                }
-            }
-        }();
+        std::unique_ptr<Piece> selectedPiece = getPieceFromUser("Enter piece char (eg. 'K', 'k'): ");
+        const Location selectedLocation = getLocationFromUser("Place at location: ");
 
         game.board.insert(selectedLocation, std::move(selectedPiece));
         gameView->viewBoard(game.board);
 
     }
-
+    // TODO: add isValidBoard() for things like exactly 1 king of each colour
+    // TODO: selectStartingTurn()
 }
 
 GameController::GameController(const GameController &rhs)
@@ -369,25 +342,53 @@ bool GameController::isBackRow(const Location<> &square, const Player &player) {
     return square.getBoardRowIndex() == 0;
 }
 
-Game::MoveInfo GameController::getMoveInfo() const {
-    const auto source = Location{gameView->readInput("Type source square: ")};
-    const auto destination = Location{gameView->readInput("Type destination square: ")};
+Game::MoveInfo GameController::getMoveInfoFromUser() const {
+
+    const auto source = getLocationFromUser("Type source square: ");
+    const auto destination = getLocationFromUser("Type destination square: ");
 
     auto promotionPiece = std::invoke([&]() -> std::unique_ptr<Piece> {
         if (dynamic_cast<Pawn*>(game.board.pieceAt(source)) == nullptr || !isBackRow(destination, game.activePlayer)) {
             return nullptr;
         }
         while (true) {
-            const char pieceChar = gameView->readInput("Enter promotion piece char (eg. 'Q', 'R'): ")[0];
-            const char pieceCode = toupper(pieceChar, std::locale());
-            if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
-                return pieceFactories.at(pieceCode)(game.activePlayer.getColour());
+            auto piece = getPieceFromUser("Enter promotion piece char (eg. 'Q', 'R'): ");
+
+            if (   !dynamic_cast<King*>(piece.get())
+                && !dynamic_cast<Pawn*>(piece.get())
+                && piece->getColour() == game.activePlayer.getColour()){
+                return piece;
             } else {
-                gameView->displayException(std::runtime_error("Entered invalid char"));
-                std::cout << '\n'; // TODO: no std::cout! handle with gameView
+                gameView->displayException(std::runtime_error("Invalid Promotion Piece (wrong piece type and/or colour)"));
             }
         }
+
     });
 
     return {source, destination, std::move(promotionPiece)};
+}
+
+Location<> GameController::getLocationFromUser(std::string_view message) const {
+    while (true) {
+        try {
+            return Location{gameView->readInput(message)};
+        }
+        catch (const std::exception& e) {
+            gameView->displayException(e);
+        }
+    }
+}
+
+std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message) const {
+    while (true) {
+        const char pieceChar = gameView->readInput(message)[0];
+        const char pieceCode = toupper(pieceChar, std::locale());
+        if (pieceFactories.find(pieceCode) != pieceFactories.end()) {
+            const auto colour = (isupper(pieceChar) ? Piece::Colour::WHITE : Piece::Colour::BLACK);
+            return pieceFactories.at(pieceCode)(colour);
+        } else {
+            gameView->displayException(std::runtime_error("Entered invalid char"));
+            std::cout << '\n'; // TODO: no std::cout! handle with gameView
+        }
+    }
 }

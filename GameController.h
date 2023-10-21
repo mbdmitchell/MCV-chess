@@ -69,7 +69,9 @@ private:
     /// MISC.
     static std::map<char, PieceFactory> createPieceFactories();
 
-    [[nodiscard]] Game::MoveInfo getMoveInfo() const;
+    [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const;
+    [[nodiscard]] Location<> getLocationFromUser(std::string_view message) const;
+    [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 };
 
 
