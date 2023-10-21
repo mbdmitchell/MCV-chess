@@ -22,6 +22,7 @@ bool Pawn::isValidMovePath(const Location<> &source,
 {
     const bool isMoveForward = (getColour() == Piece::Colour::WHITE);
     const bool isMovingInRightDirection = (isMoveForward == (getColour() == Piece::Colour::WHITE));
+
     if (source == destination || !isMovingInRightDirection) return false;
 
     if (!(Location<>::isVertical(source, destination) || Location<>::isDiagonal(source, destination))){
@@ -38,7 +39,9 @@ bool Pawn::isValidMovePath(const Location<> &source,
             return true;
         }
         else if (abs(deltaRow) == 2) {
-            return ((row == 1 && getColour() == Piece::Colour::WHITE) || (row == 6 && getColour() == Piece::Colour::BLACK));
+            const gsl::index startingRowIndexWhite = 1;
+            const gsl::index startingRowIndexBlack = 6;
+            return ((row == startingRowIndexWhite && getColour() == Piece::Colour::WHITE) || (row == startingRowIndexBlack && getColour() == Piece::Colour::BLACK));
         }
         else {
             return false;
@@ -46,7 +49,7 @@ bool Pawn::isValidMovePath(const Location<> &source,
     }
 
     // Location::isDiagonal(source, destination)) == true
-    const bool isEnPassant = enPassantTargetSquare == Location(source.get<0>().value(), destination.get<1>().value()); // Location(source.getRow(), destination.getColumn()));
+    const bool isEnPassant = enPassantTargetSquare == Location(source.get<0>().value(), destination.get<1>().value()); // TODO: Location(source.getRow(), destination.getColumn()));
     return isEnPassant || (isCapture && abs(deltaRow) == 1);
 }
 
