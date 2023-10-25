@@ -59,10 +59,12 @@ public:
 
     /// OPERATORS
 
-    explicit operator std::string() const;
+    explicit operator std::string() const; // TODO: check it's unused, if so, delete
+    // TODO: can use fact that if class A has a constructor that takes an object of class B,
+    // you can convert a B object to an A object with static_cast()
 
     auto operator<=>(const Location& other) const;
-    bool operator==(const Location& other) const;
+    bool operator==(const Location& other) const; 
 
     Location& operator++();
     const Location operator++(int);
