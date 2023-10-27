@@ -31,3 +31,9 @@ To build and run MCV Chess, follow these steps:
 ## Contributing
 
 MCV Chess is a personal project, and I do not actively accept contributions. However, you are welcome to fork the repository and use the code as a starting point for your own projects or experiments. Feel free to explore, modify, and extend the code to suit your needs.
+
+## Going forward
+
+As is the nature of any project, there are near-infinite ways to expand it's scope. At time of writing, there are a number of smaller TODOs in the code. 
+Some things I wish to not covered by TODOs are:
+- Compile it for browser and have it run in the browser (using emscripten and WA)
