@@ -35,7 +35,7 @@ MCV Chess is a personal project, and I do not actively accept contributions. How
 ## Going forward
 
 As is the nature of any project, there are near-infinite ways to expand it's scope. At time of writing, there are a number of smaller TODOs in the code. 
-Some things I wish to not covered by TODOs are:
+Some things I wish to do that are not covered by TODOs are:
 
 ### 1. Compile it for browser and have it run in the browser (using emscripten and WA)
 - Write C++ code that uses OpenGL
