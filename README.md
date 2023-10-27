@@ -36,4 +36,9 @@ MCV Chess is a personal project, and I do not actively accept contributions. How
 
 As is the nature of any project, there are near-infinite ways to expand it's scope. At time of writing, there are a number of smaller TODOs in the code. 
 Some things I wish to not covered by TODOs are:
-- Compile it for browser and have it run in the browser (using emscripten and WA)
+
+### 1. Compile it for browser and have it run in the browser (using emscripten and WA)
+- Write C++ code that uses OpenGL
+- Emscripten translates OpenGL to WebGL (JavaScript)
+- Emscripten compiles the rest of the C++ to WebAssembly (WASM)
+- WASM + JavaScript is run by your browser
