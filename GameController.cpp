@@ -69,7 +69,7 @@ void GameController::makeMove(const Location &source, const Location &destinatio
 
 void GameController::submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece = nullptr) {
 
-    // pre-move validation <- todo: make one function to call both
+    // pre-move validation <- TODO: Low priority, put calcMoveValidityStatus and moveLeavesMoverInCheck in one function
     if (auto result = calcMoveValidityStatus(game.activePlayer, source, destination, promotionPiece); !result.isValid) {
         gameView->displayException(std::runtime_error("ERROR: " + result.reason));
         return;
