@@ -90,7 +90,7 @@ void GameController::submitMove(const Location &source, const Location &destinat
     swapActivePlayer();
 }
 
-void GameController::swapActivePlayer() {
+void GameController::swapActivePlayer() noexcept {
     game.activePlayer = ((game.activePlayer == game.whitePlayer) ? game.blackPlayer : game.whitePlayer);
 }
 
