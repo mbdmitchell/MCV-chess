@@ -294,6 +294,10 @@ bool GameController::inCheck(const Player& player) const {
 }
 
 void GameController::manualSetup() {
+    /// NB: Implementing has the potential to be a huge rabbit-hole so *mostly* assumes a valid position
+    /// (e.g. doesn't cover both players in check/checkmate, pawns on back ranks, person in check when opponent's turn)
+
+    /// Checks players have exactly one king as, out of all the ways to be invalid, this one would be most problematic
 
     gameView->viewBoard(game.board);
     std::cout << '\n';
@@ -307,7 +311,27 @@ void GameController::manualSetup() {
         gameView->viewBoard(game.board);
 
     }
-    // TODO: add isValidBoard() for things like exactly 1 king of each colour
+
+    const bool eachHaveExactlyOneKing = std::invoke([&](){
+        const auto& board = game.board.board;
+
+        size_t whiteKingCount = 0, blackKingCount = 0;
+
+        std::for_each(cbegin(board), cend(board), [&](const auto& it){
+            const auto& piece = it.second;
+            if (isType<King>(*piece)) {
+                (piece->getColour() == Piece::Colour::WHITE) ? ++whiteKingCount : ++blackKingCount;
+            }
+        });
+
+        return whiteKingCount == 1 && blackKingCount == 1;
+    });
+
+    if (!eachHaveExactlyOneKing) {
+        gameView->displayException(std::runtime_error("Invalid Position: Each player must have exactly one king. Clearing board..."));
+        game.board.board.clear();
+        return;
+    }
 
     game.activePlayer = getStartingPlayer();
 }
