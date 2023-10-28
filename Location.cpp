@@ -50,7 +50,7 @@ Location::RowColumnDifferences Location::calculateRowColumnDifferences(const Loc
 }
 
 bool Location::isValid() const {
-    return boardRowIndex <= maxRowIndex || boardColumnIndex <= maxColumnIndex;
+    return boardRowIndex <= maxRowIndex && boardColumnIndex <= maxColumnIndex;
 }
 
 const Location Location::operator++(int) { // (obj++)
@@ -90,7 +90,7 @@ Location::operator std::string() const {
 Location::Location(std::string_view str) // TODO: exception to handle str too short
         : Location(static_cast<gsl::index>((str[1] - '0' - 1)), static_cast<gsl::index>(str[0] - 'A')) {
     if (str[1] - '0' - 1 < 0) {
-        throw std::invalid_argument("Invalid Argument passed into Location(std::string_view str))");
+        throw std::invalid_argument("Invalid Argument Location(std::string_view str))");
     }
 }
 
