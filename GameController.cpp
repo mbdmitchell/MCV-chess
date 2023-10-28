@@ -390,7 +390,7 @@ bool GameController::isUnderAttackBy(Location target, const Player &opponent) co
     auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
         const auto& [source, sourcePiece] = it;
         if (sourcePiece.get()->getColour() != opponent.getColour()) return false;
-        return isValidMove(opponent, source, target, nullptr); // TODO: "Too few arguments to function call, expected 4, have 3" despite default function param
+        return isValidMove(opponent, source, target);
     };
 
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
