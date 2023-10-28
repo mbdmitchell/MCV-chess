@@ -85,7 +85,7 @@ void GameController::submitMove(const Location &source, const Location &destinat
 }
 
 void GameController::swapActivePlayer() {
-    game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
+    game.activePlayer = ((game.activePlayer == game.whitePlayer) ? game.blackPlayer : game.whitePlayer);
 }
 
 bool GameController::isValidMove(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const {
@@ -125,31 +125,6 @@ bool GameController::moveLeavesMoverInCheck(const Location &source, const Locati
     bool returnValue = copy.inCheck(copy.game.activePlayer);
 
     return returnValue;
-}
-
-Location GameController::getLocationOfKing(Piece::Colour kingColour) const { // TODO: pass a player, not a colour
-    const auto& board = game.board.board;
-
-    auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
-        const auto& piece = entry.second;
-        return (piece->getColour() == kingColour) && (isType<King>(*piece));
-    });
-
-    return (it != board.end() ? it->first : Location{});
-}
-
-bool GameController::isUnderAttackBy(Location target, const Piece::Colour& opponentsColour) const { // TODO: pass a player, not a colour
-    // NB: a square isn't marked as under attack if the attacker has a piece there.
-    // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
-    // and you cant castle through an en passant target square, this is a moot issue
-    const auto& board = game.board.board;
-    auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
-        const auto& [source, sourcePiece] = it;
-        if (sourcePiece.get()->getColour() != opponentsColour) return false;
-        return isValidMove(game.getPlayerWithColour(opponentsColour), source, target);
-    };
-
-    return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
 }
 
 void GameController::setEnPassantTargetSquare(const Location &source, const Location &destination) {
@@ -292,9 +267,8 @@ void GameController::initGameLoop() {
 }
 
 bool GameController::inCheck(const Player& player) const {
-    const Piece::Colour playerColour = player.getColour();
-    const Piece::Colour opponentColour = playerColour == Piece::Colour::WHITE ? Piece::Colour::BLACK : Piece::Colour::WHITE;
-    return isUnderAttackBy(getLocationOfKing(playerColour),opponentColour);
+    const Player& opponent = (player.getColour() == Piece::Colour::WHITE ? game.blackPlayer : game.whitePlayer);
+    return isUnderAttackBy(getLocationOfKing(player),opponent);
 }
 
 void GameController::manualSetup() {
@@ -394,4 +368,30 @@ std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message
             std::cout << '\n'; // TODO: no std::cout! handle with gameView
         }
     }
+}
+
+Location GameController::getLocationOfKing(const Player &player) const {
+    const auto& board = game.board.board;
+    const auto& kingColour = player.getColour();
+
+    auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
+        const auto& piece = entry.second;
+        return (piece->getColour() == kingColour) && (isType<King>(*piece));
+    });
+
+    return (it != board.end() ? it->first : Location{});
+}
+
+bool GameController::isUnderAttackBy(Location target, const Player &opponent) const {
+    // NB: a square isn't marked as under attack if the attacker has a piece there.
+    // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
+    // and you cant castle through an en passant target square, this is a moot issue
+    const auto& board = game.board.board;
+    auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
+        const auto& [source, sourcePiece] = it;
+        if (sourcePiece.get()->getColour() != opponent.getColour()) return false;
+        return isValidMove(opponent, source, target, nullptr); // TODO: "Too few arguments to function call, expected 4, have 3" despite default function param
+    };
+
+    return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
 }

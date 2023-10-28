@@ -33,7 +33,3 @@ std::string Game::gameStateAsString(Game::GameState gs) {
         case GameState::IN_PROGRESS: return "Game In Progress";
     }
 }
-
-Player Game::getPlayerWithColour(Piece::Colour colour) const {
-    return (colour == Piece::Colour::WHITE) ? player1 : player2;
-}

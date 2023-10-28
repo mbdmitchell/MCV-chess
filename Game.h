@@ -22,12 +22,13 @@ private:
     /// DATA MEMBERS
     Board board{};
     GameState gameState {IN_PROGRESS};
-    const Player player1 {Piece::Colour::WHITE};
-    const Player player2 {Piece::Colour::BLACK};
+    const Player whitePlayer {Piece::Colour::WHITE}; // TODO: const std::array<Player> players
+    const Player blackPlayer {Piece::Colour::BLACK};
     Location enPassantTargetSquare{};
     castingAvailability whiteCastingAvailability {true, true};
     castingAvailability blackCastingAvailability {true, true};
     Player activePlayer = player1;
+    Player activePlayer = whitePlayer; // TODO: reference to the player
 
     /// FRIENDS
     friend class GameController;
@@ -40,6 +41,5 @@ public:
 
     /// MISC.
     static std::string gameStateAsString(GameState gs);
-    [[nodiscard]] Player getPlayerWithColour(Piece::Colour colour) const;
 };
 

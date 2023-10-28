@@ -29,10 +29,9 @@ public:
     void initGameLoop();
     void displayAllUnderAttackBy(const Player& player) {
         Game copy {game};
-        auto col = player.getColour();
         copy.board.board.clear();
         for (Location i = Location{"A1"}; i <= Location{"H8"}; ++i) {
-            if (isUnderAttackBy(i, col)) {
+            if (isUnderAttackBy(i, player)) {
                 copy.board.insert(i, std::make_unique<Pawn>(Piece::Colour::WHITE));
             }
         }
@@ -46,7 +45,7 @@ private:
     [[nodiscard]] bool isValidMove(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location &source, const Location &destination) const;
     [[nodiscard]] bool isEnPassant(const Location &source, const Location &destination) const;
-    [[nodiscard]] static bool isBackRow(const Location& square, const Player& player);
+    [[nodiscard]] bool isBackRow(const Location& square, const Player& player) const;
 
     template <typename T>
     [[nodiscard]] static bool isType(const Piece& piece) {
@@ -67,9 +66,10 @@ private:
     [[nodiscard]] bool moveLeavesMoverInCheck(const Location &source, const Location &destination) const;
 
     /// GET / CALCULATE
-    [[nodiscard]] Location getLocationOfKing(Piece::Colour kingColour) const;
+
+    [[nodiscard]] Location getLocationOfKing(const Player& player) const;
     [[nodiscard]] Game::GameState calculateGameState() const;
-    [[nodiscard]] bool isUnderAttackBy(Location location, const Piece::Colour& opponentsColour) const;
+    [[nodiscard]] bool isUnderAttackBy(Location target, const Player& opponent) const;
     [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
 
     /// ... get from user
