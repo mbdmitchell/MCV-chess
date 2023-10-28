@@ -87,16 +87,19 @@ Location::operator std::string() const {
     }
 }
 
-Location::Location(std::string_view str) // TODO: exception to handle str too short
-        : Location(static_cast<gsl::index>((str[1] - '0' - 1)), static_cast<gsl::index>(str[0] - 'A')) {
-    if (str[1] - '0' - 1 < 0) {
-        throw std::invalid_argument("Invalid Argument Location(std::string_view str))");
+Location::Location(std::string_view str) {
+    if (str.size() != 2) {
+        // Handle the error appropriately, e.g., throw an exception or set the object to a default location.
+        throw std::invalid_argument("Invalid input string. Expected a 2-character (uppercase) string.");
+    } else {
+        // Handle other errors in Location(gsl::index row, gsl::index col)
+        *this = Location{static_cast<gsl::index>(str[1] - '0' - 1), static_cast<gsl::index>(str[0] - 'A')};
     }
 }
 
 Location::Location(gsl::index row, gsl::index col) : boardRowIndex{row}, boardColumnIndex{col} {
     if (!isValid()) {
-        throw std::invalid_argument("Invalid Argument passed into Location(gsl::index row, gsl::index col)");
+        throw std::invalid_argument("Invalid Location");
     }
 }
 
