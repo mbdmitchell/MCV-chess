@@ -266,7 +266,6 @@ void GameController::initGameLoop() {
     while (game.gameState == Game::GameState::IN_PROGRESS) {
 
         gameView->viewBoard(game.board);
-        std::cout << '\n'; // TODO: no std::cout! handle with gameView
 
         try {
             gameView->displayTurn(game.activePlayer);
@@ -275,7 +274,7 @@ void GameController::initGameLoop() {
             const Player preMoveActivePlayer = game.activePlayer;
 
             submitMove(source, destination, promotionPiece.get());
-            // TODO: submitMove -> bool submitMoveAndReturnSuccessStatus()??
+            // TODO: Low priority, submitMove -> bool submitMoveAndReturnSuccessStatus()??
             if (preMoveActivePlayer != game.activePlayer) {
                 game.gameState = calculateGameState();
             }
@@ -412,7 +411,6 @@ std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message
             return pieceFactories.at(pieceCode)(colour);
         } else {
             gameView->displayException(std::runtime_error("Entered invalid char"));
-            std::cout << '\n'; // TODO: no std::cout! handle with gameView
         }
     }
 }

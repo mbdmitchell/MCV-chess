@@ -42,6 +42,8 @@ void GameViewCLI::viewBoard(const Board &b) const {
         }
     }
 
+    std::cout << '\n';
+
 }
 
 void GameViewCLI::displayException(const std::exception &e) const {
