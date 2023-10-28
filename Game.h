@@ -25,9 +25,8 @@ private:
     const Player whitePlayer {Piece::Colour::WHITE}; // TODO: const std::array<Player> players
     const Player blackPlayer {Piece::Colour::BLACK};
     Location enPassantTargetSquare{};
-    castingAvailability whiteCastingAvailability {true, true};
-    castingAvailability blackCastingAvailability {true, true};
-    Player activePlayer = player1;
+    castingAvailability whiteCastingAvailability {.kingSide = true, .queenSide = true};
+    castingAvailability blackCastingAvailability {.kingSide = true, .queenSide = true};
     Player activePlayer = whitePlayer; // TODO: reference to the player
 
     /// FRIENDS
