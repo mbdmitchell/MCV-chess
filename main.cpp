@@ -2,9 +2,6 @@
 
 // TODO: `noexcept` all the things!
 // TODO: `final` things that should be `final`
-// - e.g., bool Bishop::isValidMovePath(const Location<> &source, const Location<> &destination, const Location<> &/*enPassantTargetSquare*/, bool /*isCapture*/)
-// TODO: "Prefer pass-by-value for parameters that a function inherently would copy, but only if the parameter is 
-// of a type that supports move semantics. Otherwise, use reference-to-const parameters."
 
 /* -----------------------------------------------------------------------------
 
