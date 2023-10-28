@@ -8,7 +8,7 @@
 class Board {
 
     /// DATA MEMBERS
-    std::map<Location<>, std::unique_ptr<Piece>> board;
+    std::map<Location, std::unique_ptr<Piece>> board;
 
     /// FRIENDS
     friend class GameController;
@@ -17,13 +17,13 @@ class Board {
     /// OPERATORS
 public:
     // "function 'operator[]' with deduced return type cannot be used before it is defined"
-    auto& operator[](const Location<>& location) {
+    auto& operator[](const Location& location) {
         if (board.find(location) == board.end()) {
             board[location] = nullptr;
         }
         return board[location];
     }
-    const auto& operator[](const Location<>& location) const {
+    const auto& operator[](const Location& location) const {
         if (board.find(location) == board.end()) {
             throw std::runtime_error("Location not found in board");
         }
@@ -39,18 +39,17 @@ public:
 
     /// MISC.
 
-    [[nodiscard]] bool isPathBlocked(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool isPathBlocked(const Location &source, const Location &destination) const;
 
-    [[nodiscard]] bool thereExistsPieceAt(const Location<> &location) const;
-    [[nodiscard]] Piece* pieceAt(const Location<>& location) const;
+    [[nodiscard]] bool thereExistsPieceAt(const Location &location) const;
+    [[nodiscard]] Piece* pieceAt(const Location& location) const;
 
-    void erase(const Location<>& location);
-    void insert(const Location<>& location, std::unique_ptr<Piece> piece);
+    void erase(const Location& location);
+    void insert(const Location& location, std::unique_ptr<Piece> piece);
 
 private:
 
-    static Location<>::RowColumnDifferences calculateMinimalDistanceMove(
-            const Location<>::RowColumnDifferences& totalRowColumnDifferences);
+    static Location::RowColumnDifferences calculateMinimalDistanceMove(const Location::RowColumnDifferences& totalRowColumnDifferences);
 
 };
 

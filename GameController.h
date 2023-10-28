@@ -25,7 +25,7 @@ public:
 
     /// MISC.
     // TODO: submitMove(...) -> submitMove(Game::MoveInfo)
-    void submitMove(const Location<> &source, const Location<> &destination, const Piece* const promotionPiece);
+    void submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece);
     void initGameLoop();
     void displayAllUnderAttackBy(const Player& player) {
         Game copy {game};
@@ -43,10 +43,10 @@ private:
 
     /// VALIDATION
     // TODO: isValidMove(Player, ...) -> submitMove(Player, Game::MoveInfo)    
-    [[nodiscard]] bool isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece *promotionPiece) const;
-    [[nodiscard]] bool isValidCastling(const Location<> &source, const Location<> &destination) const;
-    [[nodiscard]] bool isEnPassant(const Location<> &source, const Location<> &destination) const;
-    [[nodiscard]] static bool isBackRow(const Location<>& square, const Player& player);
+    [[nodiscard]] bool isValidMove(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const;
+    [[nodiscard]] bool isValidCastling(const Location &source, const Location &destination) const;
+    [[nodiscard]] bool isEnPassant(const Location &source, const Location &destination) const;
+    [[nodiscard]] static bool isBackRow(const Location& square, const Player& player);
 
     template <typename T>
     [[nodiscard]] static bool isType(const Piece& piece) {
@@ -64,26 +64,26 @@ private:
     }
     /// CHECK
     [[nodiscard]] bool inCheck(const Player& player) const;
-    [[nodiscard]] bool moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const;
+    [[nodiscard]] bool moveLeavesMoverInCheck(const Location &source, const Location &destination) const;
 
     /// GET / CALCULATE
-    [[nodiscard]] Location<> getLocationOfKing(Piece::Colour kingColour) const;
+    [[nodiscard]] Location getLocationOfKing(Piece::Colour kingColour) const;
     [[nodiscard]] Game::GameState calculateGameState() const;
-    [[nodiscard]] bool isUnderAttackBy(Location<> location, const Piece::Colour& opponentsColour) const;
+    [[nodiscard]] bool isUnderAttackBy(Location location, const Piece::Colour& opponentsColour) const;
     [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
 
     /// ... get from user
     [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const;
-    [[nodiscard]] Location<> getLocationFromUser(std::string_view message) const;
+    [[nodiscard]] Location getLocationFromUser(std::string_view message) const;
     [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 
     /// MANIPULATE GAME / BOARD
     // TODO: makeMove(...) -> makeMove(Game::MoveInfo)
-    void makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece);
+    void makeMove(const Location &source, const Location &destination, const Piece* promotionPiece);
 
-    void setEnPassantTargetSquare(const Location<> &source, const Location<> &destination);
-    void updateCastingAvailability(const Piece& pieceMoved, const Location<> &source);
-    void handleRookCastlingMove(const Location<> &destination);
+    void setEnPassantTargetSquare(const Location &source, const Location &destination);
+    void updateCastingAvailability(const Piece& pieceMoved, const Location &source);
+    void handleRookCastlingMove(const Location &destination);
 
     void swapActivePlayer();
 

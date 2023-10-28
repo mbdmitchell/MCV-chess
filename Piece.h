@@ -24,9 +24,9 @@ public:
     [[nodiscard]] virtual explicit operator char() const = 0;
 
     /// VALIDATION.
-    [[nodiscard]] virtual bool isValidMovePath(const Location<> &source,
-                                               const Location<> &destination,
-                                               const Location<> &enPassantTargetSquare,
+    [[nodiscard]] virtual bool isValidMovePath(const Location &source,
+                                               const Location &destination,
+                                               const Location &enPassantTargetSquare,
                                                bool isCapture) const = 0;
 
     /// MISC.
@@ -42,9 +42,9 @@ public:
     [[nodiscard]] explicit operator char() const override;
 
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
 
     /// MISC.
@@ -60,9 +60,9 @@ public:
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
 
     /// MISC.
@@ -78,9 +78,9 @@ public:
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
 
     /// MISC.
@@ -95,9 +95,9 @@ public:
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
 
     /// MISC.
@@ -113,9 +113,9 @@ public:
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
 
     /// MISC.
@@ -130,11 +130,11 @@ public:
     /// OPERATORS
     [[nodiscard]] explicit operator char() const override;
     /// VALIDATION
-    [[nodiscard]] bool isValidMovePath(const Location<> &source,
-                                       const Location<> &destination,
-                                       const Location<> &enPassantTargetSquare,
+    [[nodiscard]] bool isValidMovePath(const Location &source,
+                                       const Location &destination,
+                                       const Location &enPassantTargetSquare,
                                        bool isCapture) const override;
-    [[nodiscard]] static bool isValidCastlingPath(const Location<> &source, const Location<> &destination);
+    [[nodiscard]] static bool isValidCastlingPath(const Location &source, const Location &destination);
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
 };

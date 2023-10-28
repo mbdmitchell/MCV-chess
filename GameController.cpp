@@ -39,7 +39,7 @@ void GameController::setupSimple() {
     board.insert(Location{"A1"}, std::make_unique<King>(BLACK));
 }
 
-void GameController::makeMove(const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) {
+void GameController::makeMove(const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) {
 
     Board& board = game.board;
 
@@ -67,7 +67,7 @@ void GameController::makeMove(const Location<> &source, const Location<> &destin
     board.insert(destination, promotionPiece->clone());
 }
 
-void GameController::submitMove(const Location<> &source, const Location<> &destination, const Piece* const promotionPiece = nullptr) {
+void GameController::submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece = nullptr) {
 
     // pre-move validation <- todo: make one function to call both
     if (!isValidMove(game.activePlayer, source, destination, promotionPiece)) return;
@@ -88,7 +88,7 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer.getColour() == game.player1.getColour()) ? game.player2 : game.player1);
 }
 
-bool GameController::isValidMove(const Player& player, const Location<> &source, const Location<> &destination, const Piece* promotionPiece = nullptr) const {
+bool GameController::isValidMove(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const {
     const auto& board = game.board;
     const auto& moversColour = player.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
@@ -118,7 +118,7 @@ bool GameController::isValidMove(const Player& player, const Location<> &source,
     return promotionPiece == nullptr;
 }
 
-bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Location<> &destination) const {
+bool GameController::moveLeavesMoverInCheck(const Location &source, const Location &destination) const {
 
     GameController copy {*this};
     copy.makeMove(source, destination);
@@ -127,7 +127,7 @@ bool GameController::moveLeavesMoverInCheck(const Location<> &source, const Loca
     return returnValue;
 }
 
-Location<> GameController::getLocationOfKing(Piece::Colour kingColour) const { // TODO: pass a player, not a colour
+Location GameController::getLocationOfKing(Piece::Colour kingColour) const { // TODO: pass a player, not a colour
     const auto& board = game.board.board;
 
     auto it = std::find_if(board.begin(), board.end(), [&](const auto& entry) {
@@ -138,7 +138,7 @@ Location<> GameController::getLocationOfKing(Piece::Colour kingColour) const { /
     return (it != board.end() ? it->first : Location{});
 }
 
-bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opponentsColour) const { // TODO: pass a player, not a colour
+bool GameController::isUnderAttackBy(Location target, const Piece::Colour& opponentsColour) const { // TODO: pass a player, not a colour
     // NB: a square isn't marked as under attack if the attacker has a piece there.
     // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
     // and you cant castle through an en passant target square, this is a moot issue
@@ -152,16 +152,19 @@ bool GameController::isUnderAttackBy(Location<> target, const Piece::Colour& opp
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
 }
 
-void GameController::setEnPassantTargetSquare(const Location<> &source, const Location<> &destination) {
-    const Location<>::RowColumnDifferences locationDifferences = Location<>::calculateRowColumnDifferences(source, destination);
-    if (isType<Pawn>(*game.board.pieceAt(destination)) && abs(locationDifferences.rowDifference) == 2) {
-        game.enPassantTargetSquare = destination;
-    } else {
-        game.enPassantTargetSquare = Location{};
-    }
+void GameController::setEnPassantTargetSquare(const Location &source, const Location &destination) {
+    const Location::RowColumnDifferences locationDifferences = Location::calculateRowColumnDifferences(source, destination);
+
+    game.enPassantTargetSquare = [&](){
+        if (isType<Pawn>(*game.board.pieceAt(destination)) && abs(locationDifferences.rowDifference) == 2) {
+            return destination;
+        }
+        return Location{};
+    }();
+
 }
 
-bool GameController::isValidCastling(const Location<> &source, const Location<> &destination) const {
+bool GameController::isValidCastling(const Location &source, const Location &destination) const {
 
     if (!King::isValidCastlingPath(source, destination)) return false;
 
@@ -178,7 +181,7 @@ bool GameController::isValidCastling(const Location<> &source, const Location<> 
     return false;
 }
 
-void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location<> &source) {
+void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location &source) {
     if (isType<King>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             game.whiteCastingAvailability = { false, false };
@@ -203,14 +206,14 @@ void GameController::updateCastingAvailability(const Piece& pieceMoved, const Lo
 
 }
 
-bool GameController::isEnPassant(const Location<> &source, const Location<> &destination) const {
+bool GameController::isEnPassant(const Location &source, const Location &destination) const {
     const auto& [sourceRow, sourceColumn] = source;
     const auto& [destinationRow, destinationColumn] = destination;
     return (isType<Pawn>(*game.board.pieceAt(destination))
-            && game.enPassantTargetSquare == Location<>{sourceRow.value(), destinationColumn.value()});
+            && game.enPassantTargetSquare == Location{sourceRow.value(), destinationColumn.value()});
 }
 
-void GameController::handleRookCastlingMove(const Location<> &destination) {
+void GameController::handleRookCastlingMove(const Location &destination) {
     Board& board = game.board;
     if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
         board.insert(Location{"D1"}, board.pieceAt(Location{"A1"})->clone());
@@ -335,9 +338,9 @@ std::map<char, PieceFactory> GameController::createPieceFactories() {
 
 const std::map<char, PieceFactory> GameController::pieceFactories = createPieceFactories();
 
-bool GameController::isBackRow(const Location<> &square, const Player &player) {
+bool GameController::isBackRow(const Location &square, const Player &player) {
     if (player.getColour() == Piece::Colour::WHITE) {
-        return square.getBoardRowIndex() == Location<>::getMaxRowIndex();
+        return square.getBoardRowIndex() == Location::getMaxRowIndex();
     }
     return square.getBoardRowIndex() == 0;
 }
@@ -368,7 +371,7 @@ Game::MoveInfo GameController::getMoveInfoFromUser() const {
     return {source, destination, std::move(promotionPiece)};
 }
 
-Location<> GameController::getLocationFromUser(std::string_view message) const {
+Location GameController::getLocationFromUser(std::string_view message) const {
     while (true) {
         try {
             return Location{gameView->readInput(message)};

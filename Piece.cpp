@@ -15,9 +15,9 @@ Pawn::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-bool Pawn::isValidMovePath(const Location<> &source,
-                           const Location<> &destination,
-                           const Location<> &enPassantTargetSquare,
+bool Pawn::isValidMovePath(const Location &source,
+                           const Location &destination,
+                           const Location &enPassantTargetSquare,
                            const bool isCapture) const
 {
     const bool isMoveForward = (getColour() == Piece::Colour::WHITE);
@@ -25,14 +25,14 @@ bool Pawn::isValidMovePath(const Location<> &source,
 
     if (source == destination || !isMovingInRightDirection) return false;
 
-    if (!(Location<>::isVertical(source, destination) || Location<>::isDiagonal(source, destination))){
+    if (!(Location::isVertical(source, destination) || Location::isDiagonal(source, destination))){
         return false;
     }
 
     auto& [row, col] = source;
-    const auto [deltaRow, deltaColumn] = Location<>::calculateRowColumnDifferences(source, destination);
+    const auto [deltaRow, deltaColumn] = Location::calculateRowColumnDifferences(source, destination);
 
-    if (Location<>::isVertical(source, destination)) {
+    if (Location::isVertical(source, destination)) {
         if (isCapture) {
             return false;
         }
@@ -65,11 +65,11 @@ Bishop::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-bool Bishop::isValidMovePath(const Location<> &source,
-                             const Location<> &destination,
-                             const Location<> &enPassantTargetSquare,
+bool Bishop::isValidMovePath(const Location &source,
+                             const Location &destination,
+                             const Location &enPassantTargetSquare,
                              bool isCapture) const {
-    return Location<>::isDiagonal(source, destination);
+    return Location::isDiagonal(source, destination);
 }
 
 std::unique_ptr<Piece> Bishop::clone() const {
@@ -85,11 +85,11 @@ Knight::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-bool Knight::isValidMovePath(const Location<> &source,
-                             const Location<> &destination,
-                             const Location<> &enPassantTargetSquare,
+bool Knight::isValidMovePath(const Location &source,
+                             const Location &destination,
+                             const Location &enPassantTargetSquare,
                              bool isCapture) const {
-    return Location<>::isKnightMove(source, destination);
+    return Location::isKnightMove(source, destination);
 }
 
 std::unique_ptr<Piece> Knight::clone() const {
@@ -103,12 +103,12 @@ Rook::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-bool Rook::isValidMovePath(const Location<> &source,
-                           const Location<> &destination,
-                           const Location<> &enPassantTargetSquare,
+bool Rook::isValidMovePath(const Location &source,
+                           const Location &destination,
+                           const Location &enPassantTargetSquare,
                            bool isCapture) const {
-    return (Location<>::isHorizontal(source, destination)
-        || Location<>::isVertical(source, destination));
+    return (Location::isHorizontal(source, destination)
+        || Location::isVertical(source, destination));
 }
 
 std::unique_ptr<Piece> Rook::clone() const {
@@ -124,13 +124,13 @@ Queen::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-bool Queen::isValidMovePath(const Location<> &source,
-                            const Location<> &destination,
-                            const Location<> &enPassantTargetSquare,
+bool Queen::isValidMovePath(const Location &source,
+                            const Location &destination,
+                            const Location &enPassantTargetSquare,
                             bool isCapture) const {
-    return (Location<>::isVertical(source, destination)
-        ||  Location<>::isDiagonal(source, destination)
-        ||  Location<>::isHorizontal(source, destination)
+    return (Location::isVertical(source, destination)
+        ||  Location::isDiagonal(source, destination)
+        ||  Location::isHorizontal(source, destination)
     );
 }
 
@@ -147,18 +147,18 @@ King::operator char() const {
     return ((getColour() == Piece::Colour::WHITE) ? toupper(sprite, std::locale()) : sprite);
 }
 
-[[nodiscard]] bool King::isValidCastlingPath(const Location<>& source, const Location<>& destination) {
-    const auto [rowDifference, columnDifference] { Location<>::calculateRowColumnDifferences(source, destination) };
+[[nodiscard]] bool King::isValidCastlingPath(const Location& source, const Location& destination) {
+    const auto [rowDifference, columnDifference] { Location::calculateRowColumnDifferences(source, destination) };
     return ((rowDifference == 0
              && abs(columnDifference) == 2
              && (source == Location{"E1"} || source == Location{"E8"})));
 }
-bool King::isValidMovePath(const Location<> &source,
-                           const Location<> &destination,
-                           const Location<> &enPassantTargetSquare,
+bool King::isValidMovePath(const Location &source,
+                           const Location &destination,
+                           const Location &enPassantTargetSquare,
                            bool isCapture) const {
 
-    const auto& [rowDiff, colDiff] = Location<>::calculateRowColumnDifferences(source, destination);
+    const auto& [rowDiff, colDiff] = Location::calculateRowColumnDifferences(source, destination);
     return std::max(abs(rowDiff), abs(colDiff)) == 1 || isValidCastlingPath(source, destination);
 }
 

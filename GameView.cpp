@@ -19,8 +19,8 @@ void GameViewCLI::viewBoard(const Board &b) const {
 
     const auto& board { b.board };
 
-    const gsl::index maxRowIndex { Location<>::getMaxRowIndex() };
-    const gsl::index maxColumnIndex { Location<>::getMaxColumnIndex() };
+    const gsl::index maxRowIndex { Location::getMaxRowIndex() };
+    const gsl::index maxColumnIndex { Location::getMaxColumnIndex() };
 
     for (gsl::index row = maxRowIndex; row >= 0; --row) { // top-left to bottom-right
         for (gsl::index col = 0; col <= maxColumnIndex; ++col) {

@@ -15,8 +15,8 @@ private:
         bool queenSide = true;
     };
     struct MoveInfo {
-        const Location<> source;
-        const Location<> destination;
+        const Location source;
+        const Location destination;
         std::unique_ptr<Piece> promotionPiece;
     };
     /// DATA MEMBERS
@@ -24,7 +24,7 @@ private:
     GameState gameState {IN_PROGRESS};
     const Player player1 {Piece::Colour::WHITE};
     const Player player2 {Piece::Colour::BLACK};
-    Location<> enPassantTargetSquare{};
+    Location enPassantTargetSquare{};
     castingAvailability whiteCastingAvailability {true, true};
     castingAvailability blackCastingAvailability {true, true};
     Player activePlayer = player1;
