@@ -14,12 +14,14 @@ class GameController {
 
     /// DATA MEMBERS
     Game game;
-    std::unique_ptr<GameView> gameView = std::make_unique<GameViewCLI>(); // Change if implementing other `GameView`s
+    std::unique_ptr<GameView> gameView = std::make_unique<GameViewCLI>();
     static const std::map<char, PieceFactory> pieceFactories;
 
     /// CONSTRUCTORS / OVERLOADS
 public:
     GameController() = default;
+    explicit GameController(gsl::not_null<GameView*> gv) : gameView{gv}, game{} { }
+
     GameController(const GameController& rhs); // Change if implementing other `GameView`s
     GameController& operator=(const GameController& rhs);
 
