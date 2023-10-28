@@ -16,6 +16,7 @@ public:
     virtual void displayTurn(const Player& player) const = 0;
 
     virtual void displayException(const std::exception& e) const = 0;
+    [[nodiscard]] virtual std::unique_ptr<GameView> clone() const noexcept = 0;
 };
 
 class GameViewCLI : public GameView {
@@ -29,5 +30,8 @@ public:
     void displayTurn(const Player& player) const override;
 
     void displayException(const std::exception& e) const override;
+    [[nodiscard]] std::unique_ptr<GameView> clone() const noexcept override {
+        return std::make_unique<GameViewCLI>(*this);
+    }
 };
 
