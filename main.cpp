@@ -1,8 +1,5 @@
 #include "GameController.h"
 
-// TODO: `noexcept` all the things!
-// TODO: `final` things that should be `final`
-
 /* -----------------------------------------------------------------------------
 
 IDEA - probably won't implement but thought it was fun
@@ -22,7 +19,7 @@ public:
 ----------------------------------------------------------------------------- */
 
 int main() {
-    GameController g{};
+    GameController g {new GameViewCLI};
     g.setup();
     g.initGameLoop();
     return EXIT_SUCCESS;

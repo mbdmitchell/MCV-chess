@@ -527,3 +527,14 @@ bool GameController::isDrawByInsufficientMaterial() const noexcept {
 
     return false;
 }
+
+void GameController::displayAllUnderAttackBy(const Player &player) noexcept {
+    Game copy {game};
+    copy.board.board.clear();
+    for (Location i = Location{"A1"}; i <= Location{"H8"}; ++i) {
+        if (isUnderAttackBy(i, player)) {
+            copy.board.insert(i, std::make_unique<Pawn>(Piece::Colour::WHITE));
+        }
+    }
+    gameView->viewBoard(copy.board);
+}

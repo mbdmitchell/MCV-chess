@@ -32,18 +32,9 @@ public:
 
     /// MISC.
     // TODO: submitMove(...) -> submitMove(Game::MoveInfo)
-    void submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece) noexcept;
+    void submitMove(const Location &source, const Location &destination, const Piece* promotionPiece) noexcept;
     void initGameLoop() noexcept;
-    void displayAllUnderAttackBy(const Player& player) noexcept {
-        Game copy {game};
-        copy.board.board.clear();
-        for (Location i = Location{"A1"}; i <= Location{"H8"}; ++i) {
-            if (isUnderAttackBy(i, player)) {
-                copy.board.insert(i, std::make_unique<Pawn>(Piece::Colour::WHITE));
-            }
-        }
-        gameView->viewBoard(copy.board);
-    }
+    void displayAllUnderAttackBy(const Player& player) noexcept;
 
 private:
 
