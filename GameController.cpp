@@ -230,8 +230,9 @@ void GameController::handleRookCastlingMove(const Location &destination) {
 Game::GameState GameController::calculateGameState() const {
     if (thereExistsValidMove(game.activePlayer)) {
         // todo: implement additional draw conditions
-        /*if (isDrawByInsufficientMaterial() || isThreeFoldRepetition() || isFiftyMoveRule())
-            return GameState::DRAW*/
+        if (isDrawByInsufficientMaterial() /*|| isThreeFoldRepetition() || isFiftyMoveRule()*/) {
+            return Game::GameState::DRAW;
+        }
         return Game::GameState::IN_PROGRESS;
     }
     else {
@@ -425,4 +426,82 @@ Player GameController::getStartingPlayer() const {
         else if (startColour == 'B') { return game.blackPlayer; }
         else { gameView->displayException(std::runtime_error("Starting colour char not recognised"));}
     }
+}
+
+bool GameController::isDrawByInsufficientMaterial() const {
+    /** NB: This innocent-seeming function is more complex to implement in accordance with FIDE rules than it
+     * may seem, due to the following also being classed as "Insufficient Material"
+     *
+     * FIDE rules (article 6.9)
+     * "However, the game is drawn if the position is such that the opponent cannot checkmate the player’s king
+     * by any possible series of legal moves."
+     *
+     * This means the position 4k3/8/8/1p2p2p/1P2P2P/8/8/4K3 (FEN notation) is also classed as insufficient material,
+     * despite many pieces being on the board.
+     *
+     * It's worth noting that this is so low-priority that, at the time of writing this (28 Oct 2023),
+     * neither of the two largest chess sites chess.com and lichess.com have implemented this rule
+     * TODO: Low priority, Integrate a 'helpmate analyser' to fix this.
+     */
+
+     const bool thereExistsAPawnOrMajorPiece = [&](){
+         auto& board = game.board.board;
+         return std::any_of(begin(board), end(board), [](const auto& it) {
+             const auto& piece = it.second;
+             return isType<Rook>(*piece) || isType<Queen>(*piece) || isType<Pawn>(*piece);
+         });
+     }();
+
+    if (thereExistsAPawnOrMajorPiece) return false;
+
+    struct MinorPieceCount {
+        size_t whiteBishopCount, whiteKnightCount, blackBishopCount, blackKnightCount;
+    };
+
+    const MinorPieceCount minorPieceCount = [&](){
+
+        MinorPieceCount count {0,0,0,0};
+
+        auto& board = game.board.board;
+
+        std::for_each(cbegin(board), cend(board), [&](const auto& it){
+            const auto& piece = it.second;
+            if (isType<Bishop>(*piece)) {
+                (piece->getColour() == Piece::Colour::WHITE) ? ++count.whiteBishopCount : ++count.blackBishopCount;
+            }
+            else if (isType<Knight>(*piece)) {
+                (piece->getColour() == Piece::Colour::WHITE) ? ++count.whiteKnightCount : ++count.blackKnightCount;
+            }
+        });
+
+        return count;
+
+    }();
+
+    const auto totalWhiteMinorPieces = minorPieceCount.whiteBishopCount + minorPieceCount.whiteKnightCount;
+    const auto totalBlackMinorPieces = minorPieceCount.blackBishopCount + minorPieceCount.blackKnightCount;
+
+    // trivial draw conditions
+    if (totalWhiteMinorPieces == 1 && totalBlackMinorPieces == 1) return true;
+    if (totalWhiteMinorPieces > 2 || totalBlackMinorPieces > 2) return true;
+
+    // if either side has a lone king
+    if (totalWhiteMinorPieces == 0 || totalBlackMinorPieces == 0) {
+        if ((totalWhiteMinorPieces == totalBlackMinorPieces)
+            || (totalWhiteMinorPieces == 1 || totalBlackMinorPieces == 1)
+            || (minorPieceCount.whiteKnightCount == 2 || minorPieceCount.blackKnightCount == 2)) {
+            return true;
+        }
+    }
+
+    // if (1 minor VS 2 minor)
+    // 2 minor pieces against one results in a draw, except when the stronger side has a bishop Pair
+    if (totalWhiteMinorPieces == 1 && totalBlackMinorPieces == 2
+    || totalWhiteMinorPieces == 2
+    && totalBlackMinorPieces == 1)
+    {
+        return minorPieceCount.whiteBishopCount != 2 && minorPieceCount.blackBishopCount != 2;
+    }
+
+    return false;
 }

@@ -98,6 +98,7 @@ private:
     /// MISC.
     static std::map<char, PieceFactory> createPieceFactories();
 
+    [[nodiscard]] bool isDrawByInsufficientMaterial() const;
 };
 
 
