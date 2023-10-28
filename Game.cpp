@@ -7,8 +7,8 @@
 Game::Game(const Game &other)
         : gameState{other.gameState}
         , enPassantTargetSquare{other.enPassantTargetSquare}
-        , whiteCastingAvailability{other.whiteCastingAvailability}
-        , blackCastingAvailability{other.blackCastingAvailability}
+        , whiteCastlingAvailability{other.whiteCastlingAvailability}
+        , blackCastlingAvailability{other.blackCastlingAvailability}
         , activePlayer{other.activePlayer}
 {
     for (const auto& pair : other.board) {

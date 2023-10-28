@@ -10,7 +10,7 @@ class Game {
 public:
     enum GameState {IN_PROGRESS, DRAW, STALEMATE, WHITE_WIN, BLACK_WIN};
 private:
-    struct castingAvailability {
+    struct castlingAvailability {
         bool kingSide = true;
         bool queenSide = true;
     };
@@ -25,8 +25,8 @@ private:
     const Player whitePlayer {Piece::Colour::WHITE}; // TODO: const std::array<Player> players
     const Player blackPlayer {Piece::Colour::BLACK};
     Location enPassantTargetSquare{};
-    castingAvailability whiteCastingAvailability {.kingSide = true, .queenSide = true}; // TODO: player has castling Availability
-    castingAvailability blackCastingAvailability {.kingSide = true, .queenSide = true};
+    castlingAvailability whiteCastlingAvailability {.kingSide = true, .queenSide = true}; // TODO: player has castling Availability
+    castlingAvailability blackCastlingAvailability {.kingSide = true, .queenSide = true};
     Player activePlayer = whitePlayer;
 
     /// FRIENDS

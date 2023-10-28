@@ -163,13 +163,13 @@ bool GameController::isValidCastling(const Location &source, const Location &des
     if (!King::isValidCastlingPath(source, destination)) return false;
 
     if (destination == Location{"C1"}) {
-        return game.whiteCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B1"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
+        return game.whiteCastlingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B1"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
     } else if (destination == Location{"C8"}) {
-        return game.blackCastingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B8"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
+        return game.blackCastlingAvailability.queenSide && !game.board.thereExistsPieceAt(Location{"B8"}); // !game.board.thereExistsPieceAt(Location{"B1"}) as not handled by isPathBlocked()
     } else if (destination == Location{"G1"}) {
-        return game.whiteCastingAvailability.kingSide;
+        return game.whiteCastlingAvailability.kingSide;
     } else if (destination == Location{"G8"}) {
-        return game.blackCastingAvailability.kingSide;
+        return game.blackCastlingAvailability.kingSide;
     }
 
     return false;
@@ -178,22 +178,22 @@ bool GameController::isValidCastling(const Location &source, const Location &des
 void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location &source) {
     if (isType<King>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
-            game.whiteCastingAvailability = { .kingSide = false, .queenSide = false };
+            game.whiteCastlingAvailability = { .kingSide = false, .queenSide = false };
         } else {
-            game.blackCastingAvailability = { .kingSide = false, .queenSide = false };
+            game.blackCastlingAvailability = { .kingSide = false, .queenSide = false };
         }
     } else if (isType<Rook>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             if (source == Location("A1")) {
-                game.whiteCastingAvailability.queenSide = false;
+                game.whiteCastlingAvailability.queenSide = false;
             } else if (source == Location("H1")) {
-                game.whiteCastingAvailability.kingSide = false;
+                game.whiteCastlingAvailability.kingSide = false;
             }
         } else {
             if (source == Location("A8")) {
-                game.blackCastingAvailability.queenSide = false;
+                game.blackCastlingAvailability.queenSide = false;
             } else if (source == Location("H8")) {
-                game.blackCastingAvailability.kingSide = false;
+                game.blackCastlingAvailability.kingSide = false;
             }
         }
     }
