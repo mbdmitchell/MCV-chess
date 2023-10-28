@@ -312,8 +312,8 @@ std::map<char, PieceFactory> GameController::createPieceFactories() {
 
 const std::map<char, PieceFactory> GameController::pieceFactories = createPieceFactories();
 
-bool GameController::isBackRow(const Location &square, const Player &player) {
-    if (player.getColour() == Piece::Colour::WHITE) {
+bool GameController::isBackRow(const Location &square, const Player &player) const {
+    if (player == game.whitePlayer) {
         return square.getBoardRowIndex() == Location::getMaxRowIndex();
     }
     return square.getBoardRowIndex() == 0;
