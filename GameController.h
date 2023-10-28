@@ -7,6 +7,11 @@ using PieceFactory = std::function<std::unique_ptr<Piece>(Piece::Colour)>;
 
 class GameController {
 
+    struct MoveValidityStatus {
+        bool isValid;
+        std::string reason;
+    };
+
     /// DATA MEMBERS
     Game game;
     std::unique_ptr<GameView> gameView = std::make_unique<GameViewCLI>(); // Change if implementing other `GameView`s
@@ -42,7 +47,7 @@ private:
 
     /// VALIDATION
     // TODO: isValidMove(Player, ...) -> submitMove(Player, Game::MoveInfo)    
-    [[nodiscard]] bool isValidMove(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const;
+    [[nodiscard]] GameController::MoveValidityStatus calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const;
     [[nodiscard]] bool isValidCastling(const Location &source, const Location &destination) const;
     [[nodiscard]] bool isEnPassant(const Location &source, const Location &destination) const;
     [[nodiscard]] bool isBackRow(const Location& square, const Player& player) const;

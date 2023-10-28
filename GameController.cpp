@@ -70,8 +70,14 @@ void GameController::makeMove(const Location &source, const Location &destinatio
 void GameController::submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece = nullptr) {
 
     // pre-move validation <- todo: make one function to call both
-    if (!isValidMove(game.activePlayer, source, destination, promotionPiece)) return;
-    if (moveLeavesMoverInCheck(source, destination)) return;
+    if (auto result = calcMoveValidityStatus(game.activePlayer, source, destination, promotionPiece); !result.isValid) {
+        gameView->displayException(std::runtime_error("ERROR: " + result.reason));
+        return;
+    }
+    if (moveLeavesMoverInCheck(source, destination)) {
+        gameView->displayException(std::runtime_error("ERROR: Move leaves mover in check"));
+        return;
+    }
 
     const std::unique_ptr<Piece> pieceMoved = game.board.pieceAt(source)->clone(); // now we know it's valid we're safe to assign pieceMoved
 
@@ -88,35 +94,49 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer == game.whitePlayer) ? game.blackPlayer : game.whitePlayer);
 }
 
-bool GameController::isValidMove(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const {
+GameController::MoveValidityStatus GameController::calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const {
     const auto& board = game.board;
     const auto& moversColour = player.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
 
     // universal conditions
-    // TODO: throw different exception for each condition
-    if (    ! board.thereExistsPieceAt(source)
-         ||  (board.thereExistsPieceAt(destination) && board[destination]->getColour() == moversColour)
-         ||   board.pieceAt(source)->getColour() != moversColour
-         || ! board[source]->isValidMovePath(source, destination, game.enPassantTargetSquare, isDirectCapture)
-         ||   board.isPathBlocked(source, destination) )
-    {
-        return false;
+
+    if (!board.thereExistsPieceAt(source)) {
+        return {.isValid = false, .reason = "No piece at source square"};
+    }
+    if (board.pieceAt(source)->getColour() != moversColour) {
+        return {.isValid = false, .reason = "Moving wrong colour piece"};
+    }
+    if (board.thereExistsPieceAt(destination) && board[destination]->getColour() == moversColour) {
+        return {.isValid = false, .reason = "Can't take your own piece"};
+    }
+    if (!board[source]->isValidMovePath(source, destination, game.enPassantTargetSquare, isDirectCapture)) {
+        return {.isValid = false, .reason = "Piece can't move that way"};
+    }
+    if (board.isPathBlocked(source, destination)) {
+        return {.isValid = false, .reason = "Path blocked"};
     }
 
     // piece-dependant conditions
 
     // castling
     if (King::isValidCastlingPath(source, destination) && !isValidCastling(source, destination)) {
-        return false;
+        return {.isValid = false, .reason = "Invalid castling attempt"};
     }
 
     // pawn promotion
     if (isType<Pawn>(*board.pieceAt(source)) && isBackRow(destination, player)) { // if (pawn moves to back row) ...
-        return isValidPromotionPiece(promotionPiece, player);
+        const bool validPromotionPiece = isValidPromotionPiece(promotionPiece, player);
+        if (!validPromotionPiece) {
+            return {.isValid = false, .reason = "Invalid promotion piece"};
+        }
+        return {.isValid = true};
+    }
+    if (promotionPiece) {
+        return {.isValid = false, .reason = "Move includes promotion piece but can't promote"};
     }
 
-    return promotionPiece == nullptr;
+    return {.isValid = true};
 }
 
 bool GameController::moveLeavesMoverInCheck(const Location &source, const Location &destination) const {
@@ -231,7 +251,7 @@ bool GameController::thereExistsValidMove(const Player& activePlayer) const {
     for (const auto& [source, piece] : copy.game.board) {
         if (piece->getColour() != activePlayer.getColour()) continue;
         for (Location destination = Location{"A1"}; destination <= Location{"H8"}; ++destination) {
-            if (copy.isValidMove(activePlayer, source, destination)
+            if (copy.calcMoveValidityStatus(activePlayer, source, destination).isValid
             && !copy.moveLeavesMoverInCheck(source, destination)) {
                 return true;
             }
@@ -392,7 +412,7 @@ bool GameController::isUnderAttackBy(Location target, const Player &opponent) co
     auto isOpponentPieceAttackingTarget = [&](const auto& it) -> bool {
         const auto& [source, sourcePiece] = it;
         if (sourcePiece.get()->getColour() != opponent.getColour()) return false;
-        return isValidMove(opponent, source, target);
+        return calcMoveValidityStatus(opponent, source, target).isValid;
     };
 
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
