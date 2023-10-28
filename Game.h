@@ -27,7 +27,7 @@ private:
     Location enPassantTargetSquare{};
     castingAvailability whiteCastingAvailability {.kingSide = true, .queenSide = true}; // TODO: player has castling Availability
     castingAvailability blackCastingAvailability {.kingSide = true, .queenSide = true};
-    Player activePlayer = whitePlayer; // TODO: reference to the player
+    Player activePlayer = whitePlayer;
 
     /// FRIENDS
     friend class GameController;

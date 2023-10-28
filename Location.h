@@ -58,9 +58,7 @@ public:
 
     /// OPERATORS
 
-    explicit operator std::string() const; // TODO: check it's unused, if so, delete
-    // TODO: can use fact that if class A has a constructor that takes an object of class B,
-    // you can convert a B object to an A object with static_cast()
+    explicit operator std::string() const;
 
     std::strong_ordering operator<=>(const Location& other) const;
     bool operator==(const Location& other) const; 
