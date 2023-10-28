@@ -67,8 +67,8 @@ Bishop::operator char() const {
 
 bool Bishop::isValidMovePath(const Location &source,
                              const Location &destination,
-                             const Location &enPassantTargetSquare,
-                             bool isCapture) const {
+                             const Location &/*enPassantTargetSquare*/,
+                             bool /*isCapture*/) const {
     return Location::isDiagonal(source, destination);
 }
 
@@ -87,8 +87,8 @@ Knight::operator char() const {
 
 bool Knight::isValidMovePath(const Location &source,
                              const Location &destination,
-                             const Location &enPassantTargetSquare,
-                             bool isCapture) const {
+                             const Location &/*enPassantTargetSquare*/,
+                             bool /*isCapture*/) const {
     return Location::isKnightMove(source, destination);
 }
 
@@ -105,8 +105,8 @@ Rook::operator char() const {
 
 bool Rook::isValidMovePath(const Location &source,
                            const Location &destination,
-                           const Location &enPassantTargetSquare,
-                           bool isCapture) const {
+                           const Location &/*enPassantTargetSquare*/,
+                           bool /*isCapture*/) const {
     return (Location::isHorizontal(source, destination)
         || Location::isVertical(source, destination));
 }
@@ -126,8 +126,8 @@ Queen::operator char() const {
 
 bool Queen::isValidMovePath(const Location &source,
                             const Location &destination,
-                            const Location &enPassantTargetSquare,
-                            bool isCapture) const {
+                            const Location &/*enPassantTargetSquare*/,
+                            bool /*isCapture*/) const {
     return (Location::isVertical(source, destination)
         ||  Location::isDiagonal(source, destination)
         ||  Location::isHorizontal(source, destination)
@@ -155,8 +155,8 @@ King::operator char() const {
 }
 bool King::isValidMovePath(const Location &source,
                            const Location &destination,
-                           const Location &enPassantTargetSquare,
-                           bool isCapture) const {
+                           const Location &/*enPassantTargetSquare*/,
+                           bool /*isCapture*/) const {
 
     const auto& [rowDiff, colDiff] = Location::calculateRowColumnDifferences(source, destination);
     return std::max(abs(rowDiff), abs(colDiff)) == 1 || isValidCastlingPath(source, destination);

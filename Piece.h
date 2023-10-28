@@ -62,8 +62,8 @@ public:
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
-                                       const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       const Location &/*enPassantTargetSquare*/,
+                                       bool /*isCapture*/) const override;
 
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
@@ -80,8 +80,8 @@ public:
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
-                                       const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       const Location &/*enPassantTargetSquare*/,
+                                       bool /*isCapture*/) const override;
 
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
@@ -97,8 +97,8 @@ public:
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
-                                       const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       const Location &/*enPassantTargetSquare*/,
+                                       bool /*isCapture*/) const override;
 
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
@@ -115,8 +115,8 @@ public:
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
-                                       const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       const Location &/*enPassantTargetSquare*/,
+                                       bool /*isCapture*/) const override;
 
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
@@ -132,8 +132,8 @@ public:
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
-                                       const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       const Location &/*enPassantTargetSquare*/,
+                                       bool /*isCapture*/) const override;
     [[nodiscard]] static bool isValidCastlingPath(const Location &source, const Location &destination);
     /// MISC.
     [[nodiscard]] std::unique_ptr<Piece> clone() const override;
