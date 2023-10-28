@@ -94,6 +94,7 @@ bool GameController::isValidMove(const Player& player, const Location &source, c
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
 
     // universal conditions
+    // TODO: throw different exception for each condition
     if (    ! board.thereExistsPieceAt(source)
          ||  (board.thereExistsPieceAt(destination) && board[destination]->getColour() == moversColour)
          ||   board.pieceAt(source)->getColour() != moversColour
@@ -129,14 +130,12 @@ bool GameController::moveLeavesMoverInCheck(const Location &source, const Locati
 
 void GameController::setEnPassantTargetSquare(const Location &source, const Location &destination) {
     const Location::RowColumnDifferences locationDifferences = Location::calculateRowColumnDifferences(source, destination);
-
     game.enPassantTargetSquare = [&](){
         if (isType<Pawn>(*game.board.pieceAt(destination)) && abs(locationDifferences.rowDifference) == 2) {
             return destination;
         }
         return Location{};
     }();
-
 }
 
 bool GameController::isValidCastling(const Location &source, const Location &destination) const {
@@ -159,9 +158,9 @@ bool GameController::isValidCastling(const Location &source, const Location &des
 void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location &source) {
     if (isType<King>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
-            game.whiteCastingAvailability = { false, false };
+            game.whiteCastingAvailability = { .kingSide = false, .queenSide = false };
         } else {
-            game.blackCastingAvailability = { false, false };
+            game.blackCastingAvailability = { .kingSide = false, .queenSide = false };
         }
     } else if (isType<Rook>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
@@ -217,7 +216,9 @@ Game::GameState GameController::calculateGameState() const {
     }
     else {
         if (inCheck(game.activePlayer)) {
-            return game.activePlayer.getColour() == Piece::Colour::WHITE ? Game::GameState::BLACK_WIN : Game::GameState::WHITE_WIN;
+            return game.activePlayer.getColour() == Piece::Colour::WHITE
+                ? Game::GameState::BLACK_WIN
+                : Game::GameState::WHITE_WIN;
         }
         else {
             return Game::GameState::STALEMATE;
