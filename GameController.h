@@ -77,6 +77,9 @@ private:
     [[nodiscard]] Location getLocationFromUser(std::string_view message) const;
     [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
 
+    [[nodiscard]] Player getStartingPlayer() const;
+
+
     /// MANIPULATE GAME / BOARD
     // TODO: makeMove(...) -> makeMove(Game::MoveInfo)
     void makeMove(const Location &source, const Location &destination, const Piece* promotionPiece);

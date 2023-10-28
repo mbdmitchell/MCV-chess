@@ -286,7 +286,8 @@ void GameController::manualSetup() {
 
     }
     // TODO: add isValidBoard() for things like exactly 1 king of each colour
-    // TODO: selectStartingTurn()
+
+    game.activePlayer = getStartingPlayer();
 }
 
 GameController::GameController(const GameController &rhs)
@@ -394,4 +395,13 @@ bool GameController::isUnderAttackBy(Location target, const Player &opponent) co
     };
 
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
+}
+
+Player GameController::getStartingPlayer() const {
+    while (true) {
+        const char startColour = toupper(gameView->readInput("Enter starting colour ('W' or 'B'): ")[0], std::locale());
+        if (startColour == 'W') { return game.whitePlayer; }
+        else if (startColour == 'B') { return game.blackPlayer; }
+        else { gameView->displayException(std::runtime_error("Starting colour char not recognised"));}
+    }
 }
