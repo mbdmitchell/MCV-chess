@@ -24,7 +24,7 @@ Game &Game::operator=(const Game &other) {
     return *this;
 }
 
-std::string Game::gameStateAsString(Game::GameState gs) {
+std::string Game::gameStateAsString(Game::GameState gs) noexcept {
     switch (gs) {
         case GameState::WHITE_WIN: return "White Wins";
         case GameState::BLACK_WIN: return "Black Wins";

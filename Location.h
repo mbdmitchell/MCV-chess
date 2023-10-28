@@ -47,10 +47,10 @@ public:
 
     /// GETTERS
 
-    [[nodiscard]] static constexpr gsl::index getMaxColumnIndex() { return maxColumnIndex; }
-    [[nodiscard]] static constexpr gsl::index getMaxRowIndex() { return maxRowIndex; }
-    [[nodiscard]] auto getBoardRowIndex() const { return boardRowIndex; }
-    [[nodiscard]] auto getBoardColumnIndex() const { return boardColumnIndex; }
+    [[nodiscard]] static constexpr gsl::index getMaxColumnIndex() noexcept { return maxColumnIndex; }
+    [[nodiscard]] static constexpr gsl::index getMaxRowIndex() noexcept { return maxRowIndex; }
+    [[nodiscard]] auto getBoardRowIndex() const noexcept { return boardRowIndex; }
+    [[nodiscard]] auto getBoardColumnIndex() const noexcept { return boardColumnIndex; }
 
     /// ... For structured bindings
     template<size_t I>
@@ -58,34 +58,34 @@ public:
 
     /// OPERATORS
 
-    explicit operator std::string() const;
+    explicit operator std::string() const noexcept;
 
     std::strong_ordering operator<=>(const Location& other) const;
-    bool operator==(const Location& other) const; 
+    bool operator==(const Location& other) const;
 
     Location& operator++();
     const Location operator++(int);
 
     /// VALIDATION
 private:
-    [[nodiscard]] bool isValid() const;
+    [[nodiscard]] bool isValid() const noexcept;
     /// LOCATION-to-LOCATION RELATIONSHIP FUNCTIONS
 private:
-    [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Indices& indices);
+    [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Indices& indices) noexcept;
 public:
-    [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Location& source, const Location& destination);
-    [[nodiscard]] static gsl::index maxAbsoluteRowColumnDifference(const Location& source, const Location& destination);
+    [[nodiscard]] static RowColumnDifferences calculateRowColumnDifferences(const Location& source, const Location& destination) noexcept;
+    [[nodiscard]] static gsl::index maxAbsoluteRowColumnDifference(const Location& source, const Location& destination) noexcept;
 
     ///... `is move shape` functions
-    [[nodiscard]] static bool isDiagonal(const Location& source, const Location& destination);
-    [[nodiscard]] static bool isHorizontal(const Location& source, const Location& destination);
-    [[nodiscard]] static bool isVertical(const Location& source, const Location& destination);
-    [[nodiscard]] static bool isKnightMove(const Location& source, const Location& destination);
-    [[nodiscard]] static bool isForwardMove(const Location& source, const Location& destination);
+    [[nodiscard]] static bool isDiagonal(const Location& source, const Location& destination) noexcept;
+    [[nodiscard]] static bool isHorizontal(const Location& source, const Location& destination) noexcept;
+    [[nodiscard]] static bool isVertical(const Location& source, const Location& destination) noexcept;
+    [[nodiscard]] static bool isKnightMove(const Location& source, const Location& destination) noexcept;
+    [[nodiscard]] static bool isForwardMove(const Location& source, const Location& destination) noexcept;
     
     /// MISC.
 private:
-    [[nodiscard]] static Indices calculateIndices(const Location& source, const Location& destination);
+    [[nodiscard]] static Indices calculateIndices(const Location& source, const Location& destination) noexcept;
 };
 
 /// ... For structured bindings

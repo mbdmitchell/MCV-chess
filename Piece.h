@@ -18,19 +18,19 @@ public:
     virtual ~Piece() = default;
 
     /// GETTERS
-    [[nodiscard]] Colour getColour() const;
+    [[nodiscard]] Colour getColour() const noexcept;
 
     /// OPERATORS
-    [[nodiscard]] virtual explicit operator char() const = 0;
+    [[nodiscard]] virtual explicit operator char() const noexcept = 0;
 
     /// VALIDATION.
     [[nodiscard]] virtual bool isValidMovePath(const Location &source,
                                                const Location &destination,
                                                const Location &enPassantTargetSquare,
-                                               bool isCapture) const = 0;
+                                               bool isCapture) const noexcept = 0;
 
     /// MISC.
-    [[nodiscard]] virtual std::unique_ptr<Piece> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Piece> clone() const noexcept = 0;
 };
 
 class Pawn : public Piece {
@@ -39,16 +39,16 @@ public:
     explicit Pawn(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
 
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &enPassantTargetSquare,
-                                       bool isCapture) const override;
+                                       bool isCapture) const noexcept override;
 
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };
 
 
@@ -58,15 +58,15 @@ public:
     explicit Bishop(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &/*enPassantTargetSquare*/,
-                                       bool /*isCapture*/) const override;
+                                       bool /*isCapture*/) const noexcept override;
 
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };
 
 
@@ -76,15 +76,15 @@ public:
     explicit Knight(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &/*enPassantTargetSquare*/,
-                                       bool /*isCapture*/) const override;
+                                       bool /*isCapture*/) const noexcept override;
 
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };
 
 class Rook : public Piece {
@@ -93,15 +93,15 @@ public:
     explicit Rook(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &/*enPassantTargetSquare*/,
-                                       bool /*isCapture*/) const override;
+                                       bool /*isCapture*/) const noexcept override;
 
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };
 
 
@@ -111,15 +111,15 @@ public:
     explicit Queen(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &/*enPassantTargetSquare*/,
-                                       bool /*isCapture*/) const override;
+                                       bool /*isCapture*/) const noexcept override;
 
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };
 
 class King : public Piece {
@@ -128,13 +128,13 @@ public:
     explicit King(Colour colour);
 
     /// OPERATORS
-    [[nodiscard]] explicit operator char() const override;
+    [[nodiscard]] explicit operator char() const noexcept override;
     /// VALIDATION
     [[nodiscard]] bool isValidMovePath(const Location &source,
                                        const Location &destination,
                                        const Location &/*enPassantTargetSquare*/,
-                                       bool /*isCapture*/) const override;
-    [[nodiscard]] static bool isValidCastlingPath(const Location &source, const Location &destination);
+                                       bool /*isCapture*/) const noexcept override;
+    [[nodiscard]] static bool isValidCastlingPath(const Location &source, const Location &destination) noexcept;
     /// MISC.
-    [[nodiscard]] std::unique_ptr<Piece> clone() const override;
+    [[nodiscard]] std::unique_ptr<Piece> clone() const noexcept override;
 };

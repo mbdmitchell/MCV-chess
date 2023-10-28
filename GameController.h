@@ -24,15 +24,15 @@ public:
     GameController& operator=(const GameController& rhs);
 
     /// SETUP
-    void setup();
-    void manualSetup();
-    void setupSimple(); // TODO: remove from public API
+    void setup() noexcept;
+    void manualSetup() noexcept;
+    void setupSimple() noexcept; // TODO: remove from public API
 
     /// MISC.
     // TODO: submitMove(...) -> submitMove(Game::MoveInfo)
-    void submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece);
-    void initGameLoop();
-    void displayAllUnderAttackBy(const Player& player) {
+    void submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece) noexcept;
+    void initGameLoop() noexcept;
+    void displayAllUnderAttackBy(const Player& player) noexcept {
         Game copy {game};
         copy.board.board.clear();
         for (Location i = Location{"A1"}; i <= Location{"H8"}; ++i) {
@@ -47,17 +47,17 @@ private:
 
     /// VALIDATION
     // TODO: isValidMove(Player, ...) -> submitMove(Player, Game::MoveInfo)    
-    [[nodiscard]] GameController::MoveValidityStatus calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const;
-    [[nodiscard]] bool isValidCastling(const Location &source, const Location &destination) const;
-    [[nodiscard]] bool isEnPassant(const Location &source, const Location &destination) const;
-    [[nodiscard]] bool isBackRow(const Location& square, const Player& player) const;
+    [[nodiscard]] GameController::MoveValidityStatus calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece *promotionPiece) const noexcept;
+    [[nodiscard]] bool isValidCastling(const Location &source, const Location &destination) const noexcept;
+    [[nodiscard]] bool isEnPassant(const Location &source, const Location &destination) const noexcept;
+    [[nodiscard]] bool isBackRow(const Location& square, const Player& player) const noexcept;
 
     template <typename T>
     [[nodiscard]] static bool isType(const Piece& piece) {
         return dynamic_cast<const T*>(&piece);
     }
 
-    [[nodiscard]] static bool isValidPromotionPiece(const Piece* promotionPiece, const Player &player) {
+    [[nodiscard]] static bool isValidPromotionPiece(const Piece* promotionPiece, const Player &player) noexcept {
         if (promotionPiece == nullptr) return false;
         if (isType<King>(*promotionPiece)
             || isType<Pawn>(*promotionPiece)
@@ -67,38 +67,38 @@ private:
         return true;
     }
     /// CHECK
-    [[nodiscard]] bool inCheck(const Player& player) const;
-    [[nodiscard]] bool moveLeavesMoverInCheck(const Location &source, const Location &destination) const;
+    [[nodiscard]] bool inCheck(const Player& player) const noexcept;
+    [[nodiscard]] bool moveLeavesMoverInCheck(const Location &source, const Location &destination) const noexcept;
 
     /// GET / CALCULATE
 
-    [[nodiscard]] Location getLocationOfKing(const Player& player) const;
-    [[nodiscard]] Game::GameState calculateGameState() const;
-    [[nodiscard]] bool isUnderAttackBy(Location target, const Player& opponent) const;
-    [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const;
+    [[nodiscard]] Location getLocationOfKing(const Player& player) const noexcept;
+    [[nodiscard]] Game::GameState calculateGameState() const noexcept;
+    [[nodiscard]] bool isUnderAttackBy(Location target, const Player& opponent) const noexcept;
+    [[nodiscard]] bool thereExistsValidMove(const Player& activePlayer) const noexcept;
 
     /// ... get from user
-    [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const;
-    [[nodiscard]] Location getLocationFromUser(std::string_view message) const;
-    [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const;
+    [[nodiscard]] Game::MoveInfo getMoveInfoFromUser() const noexcept;
+    [[nodiscard]] Location getLocationFromUser(std::string_view message) const noexcept;
+    [[nodiscard]] std::unique_ptr<Piece> getPieceFromUser(std::string_view message) const noexcept;
 
-    [[nodiscard]] Player getStartingPlayer() const;
+    [[nodiscard]] Player getStartingPlayer() const noexcept;
 
 
     /// MANIPULATE GAME / BOARD
     // TODO: makeMove(...) -> makeMove(Game::MoveInfo)
-    void makeMove(const Location &source, const Location &destination, const Piece* promotionPiece);
+    void makeMove(const Location &source, const Location &destination, const Piece* promotionPiece) noexcept;
 
-    void setEnPassantTargetSquare(const Location &source, const Location &destination);
-    void updateCastingAvailability(const Piece& pieceMoved, const Location &source);
-    void handleRookCastlingMove(const Location &destination);
+    void setEnPassantTargetSquare(const Location &source, const Location &destination) noexcept;
+    void updateCastingAvailability(const Piece& pieceMoved, const Location &source) noexcept;
+    void handleRookCastlingMove(const Location &destination) noexcept;
 
-    void swapActivePlayer();
+    void swapActivePlayer() noexcept;
 
     /// MISC.
-    static std::map<char, PieceFactory> createPieceFactories();
+    static std::map<char, PieceFactory> createPieceFactories() noexcept;
 
-    [[nodiscard]] bool isDrawByInsufficientMaterial() const;
+    [[nodiscard]] bool isDrawByInsufficientMaterial() const noexcept;
 };
 
 

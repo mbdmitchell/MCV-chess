@@ -3,53 +3,53 @@
 const gsl::index Location::maxRowIndex;
 const gsl::index Location::maxColumnIndex;
 
-Location::Indices Location::calculateIndices(const Location &source, const Location &destination) {
+Location::Indices Location::calculateIndices(const Location &source, const Location &destination) noexcept {
     return {destination.boardColumnIndex.value(),
             destination.boardRowIndex.value(),
             source.boardColumnIndex.value(),
             source.boardRowIndex.value()};
 }
 
-gsl::index Location::maxAbsoluteRowColumnDifference(const Location &source, const Location &destination) {
+gsl::index Location::maxAbsoluteRowColumnDifference(const Location &source, const Location &destination) noexcept {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return (std::max(abs(differences.columnDifference), abs(differences.rowDifference)));
 }
 
-bool Location::isForwardMove(const Location &source, const Location &destination) {
+bool Location::isForwardMove(const Location &source, const Location &destination) noexcept {
     return destination.boardRowIndex.value() > source.boardRowIndex.value();
 }
 
-bool Location::isKnightMove(const Location &source, const Location &destination) {
+bool Location::isKnightMove(const Location &source, const Location &destination) noexcept {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return (abs(differences.columnDifference) == 2 && abs(differences.rowDifference) == 1)
            || (abs(differences.columnDifference) == 1 && abs(differences.rowDifference) == 2);
 }
 
-bool Location::isVertical(const Location &source, const Location &destination) {
+bool Location::isVertical(const Location &source, const Location &destination) noexcept {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return differences.rowDifference != 0 &&  differences.columnDifference == 0;
 }
 
-bool Location::isHorizontal(const Location &source, const Location &destination) {
+bool Location::isHorizontal(const Location &source, const Location &destination) noexcept {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return differences.rowDifference == 0 &&  differences.columnDifference != 0;
 }
 
-bool Location::isDiagonal(const Location &source, const Location &destination) {
+bool Location::isDiagonal(const Location &source, const Location &destination) noexcept {
     const auto differences = Location::calculateRowColumnDifferences(source, destination);
     return abs(differences.columnDifference) == abs(differences.rowDifference);
 }
 
-Location::RowColumnDifferences Location::calculateRowColumnDifferences(const Location &source, const Location &destination) {
+Location::RowColumnDifferences Location::calculateRowColumnDifferences(const Location &source, const Location &destination) noexcept {
     Indices indices = calculateIndices(source, destination);
     return calculateRowColumnDifferences(indices);
 }
 
-Location::RowColumnDifferences Location::calculateRowColumnDifferences(const Location::Indices &indices) {
+Location::RowColumnDifferences Location::calculateRowColumnDifferences(const Location::Indices &indices) noexcept {
     return {indices.destRow - indices.sourceRow, indices.destColumn - indices.sourceColumn};
 }
 
-bool Location::isValid() const {
+bool Location::isValid() const noexcept {
     return boardRowIndex <= maxRowIndex && boardColumnIndex <= maxColumnIndex;
 }
 
@@ -73,7 +73,7 @@ bool Location::operator==(const Location &other) const {
             && boardColumnIndex == other.boardColumnIndex);
 }
 
-Location::operator std::string() const {
+Location::operator std::string() const noexcept {
     if (boardRowIndex.has_value() && boardColumnIndex.has_value()) {
         return std::format("({}, {})", boardRowIndex.value(), boardColumnIndex.value());
     }

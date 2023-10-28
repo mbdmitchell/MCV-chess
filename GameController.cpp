@@ -1,6 +1,6 @@
 #include "GameController.h"
 
-void GameController::setup() {
+void GameController::setup() noexcept {
     const auto& BLACK = Piece::Colour::BLACK;
     const auto& WHITE = Piece::Colour::WHITE;
     auto& board = game.board;
@@ -27,7 +27,7 @@ void GameController::setup() {
     }
 }
 
-void GameController::setupSimple() {
+void GameController::setupSimple() noexcept {
     /// For debugging
     const auto& BLACK = Piece::Colour::BLACK;
     const auto& WHITE = Piece::Colour::WHITE;
@@ -39,7 +39,7 @@ void GameController::setupSimple() {
     board.insert(Location{"A1"}, std::make_unique<King>(BLACK));
 }
 
-void GameController::makeMove(const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) {
+void GameController::makeMove(const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) noexcept {
 
     Board& board = game.board;
 
@@ -67,7 +67,7 @@ void GameController::makeMove(const Location &source, const Location &destinatio
     board.insert(destination, promotionPiece->clone());
 }
 
-void GameController::submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece = nullptr) {
+void GameController::submitMove(const Location &source, const Location &destination, const Piece* const promotionPiece = nullptr) noexcept {
 
     // pre-move validation <- TODO: Low priority, put calcMoveValidityStatus and moveLeavesMoverInCheck in one function
     if (auto result = calcMoveValidityStatus(game.activePlayer, source, destination, promotionPiece); !result.isValid) {
@@ -94,7 +94,7 @@ void GameController::swapActivePlayer() {
     game.activePlayer = ((game.activePlayer == game.whitePlayer) ? game.blackPlayer : game.whitePlayer);
 }
 
-GameController::MoveValidityStatus GameController::calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const {
+GameController::MoveValidityStatus GameController::calcMoveValidityStatus(const Player& player, const Location &source, const Location &destination, const Piece* promotionPiece = nullptr) const noexcept {
     const auto& board = game.board;
     const auto& moversColour = player.getColour();
     const bool isDirectCapture = board.thereExistsPieceAt(destination); // i.e. capture that's not an en passant
@@ -139,7 +139,7 @@ GameController::MoveValidityStatus GameController::calcMoveValidityStatus(const 
     return {.isValid = true};
 }
 
-bool GameController::moveLeavesMoverInCheck(const Location &source, const Location &destination) const {
+bool GameController::moveLeavesMoverInCheck(const Location &source, const Location &destination) const noexcept {
 
     GameController copy {*this};
     copy.makeMove(source, destination);
@@ -148,7 +148,7 @@ bool GameController::moveLeavesMoverInCheck(const Location &source, const Locati
     return returnValue;
 }
 
-void GameController::setEnPassantTargetSquare(const Location &source, const Location &destination) {
+void GameController::setEnPassantTargetSquare(const Location &source, const Location &destination) noexcept {
     const Location::RowColumnDifferences locationDifferences = Location::calculateRowColumnDifferences(source, destination);
     game.enPassantTargetSquare = [&](){
         if (isType<Pawn>(*game.board.pieceAt(destination)) && abs(locationDifferences.rowDifference) == 2) {
@@ -158,7 +158,7 @@ void GameController::setEnPassantTargetSquare(const Location &source, const Loca
     }();
 }
 
-bool GameController::isValidCastling(const Location &source, const Location &destination) const {
+bool GameController::isValidCastling(const Location &source, const Location &destination) const noexcept {
 
     if (!King::isValidCastlingPath(source, destination)) return false;
 
@@ -175,7 +175,7 @@ bool GameController::isValidCastling(const Location &source, const Location &des
     return false;
 }
 
-void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location &source) {
+void GameController::updateCastingAvailability(const Piece& pieceMoved, const Location &source) noexcept {
     if (isType<King>(pieceMoved)) {
         if (game.activePlayer.getColour() == Piece::Colour::WHITE) {
             game.whiteCastlingAvailability = { .kingSide = false, .queenSide = false };
@@ -200,14 +200,14 @@ void GameController::updateCastingAvailability(const Piece& pieceMoved, const Lo
 
 }
 
-bool GameController::isEnPassant(const Location &source, const Location &destination) const {
+bool GameController::isEnPassant(const Location &source, const Location &destination) const noexcept{
     const auto& [sourceRow, sourceColumn] = source;
     const auto& [destinationRow, destinationColumn] = destination;
     return (isType<Pawn>(*game.board.pieceAt(destination))
             && game.enPassantTargetSquare == Location{sourceRow.value(), destinationColumn.value()});
 }
 
-void GameController::handleRookCastlingMove(const Location &destination) {
+void GameController::handleRookCastlingMove(const Location &destination) noexcept{
     Board& board = game.board;
     if (destination == Location{"C1"}) { //whiteCastingAvailability.queenSide;
         board.insert(Location{"D1"}, board.pieceAt(Location{"A1"})->clone());
@@ -227,7 +227,7 @@ void GameController::handleRookCastlingMove(const Location &destination) {
     }
 }
 
-Game::GameState GameController::calculateGameState() const {
+Game::GameState GameController::calculateGameState() const noexcept{
     if (thereExistsValidMove(game.activePlayer)) {
         // todo: implement additional draw conditions
         if (isDrawByInsufficientMaterial() /*|| isThreeFoldRepetition() || isFiftyMoveRule()*/) {
@@ -247,7 +247,7 @@ Game::GameState GameController::calculateGameState() const {
     }
 }
 
-bool GameController::thereExistsValidMove(const Player& activePlayer) const {
+bool GameController::thereExistsValidMove(const Player& activePlayer) const noexcept{
     GameController copy {*this};
     for (const auto& [source, piece] : copy.game.board) {
         if (piece->getColour() != activePlayer.getColour()) continue;
@@ -262,7 +262,7 @@ bool GameController::thereExistsValidMove(const Player& activePlayer) const {
     return false;
 }
 
-void GameController::initGameLoop() {
+void GameController::initGameLoop() noexcept {
     while (game.gameState == Game::GameState::IN_PROGRESS) {
 
         gameView->viewBoard(game.board);
@@ -287,12 +287,12 @@ void GameController::initGameLoop() {
     gameView->displayEndOfGameMessage(game.gameState);
 }
 
-bool GameController::inCheck(const Player& player) const {
+bool GameController::inCheck(const Player& player) const noexcept {
     const Player& opponent = (player.getColour() == Piece::Colour::WHITE ? game.blackPlayer : game.whitePlayer);
     return isUnderAttackBy(getLocationOfKing(player),opponent);
 }
 
-void GameController::manualSetup() {
+void GameController::manualSetup() noexcept {
     /// NB: Implementing has the potential to be a huge rabbit-hole so *mostly* assumes a valid position
     /// (e.g. doesn't cover both players in check/checkmate, pawns on back ranks, person in check when opponent's turn)
 
@@ -345,7 +345,7 @@ GameController &GameController::operator=(const GameController &rhs) {
     return *this;
 }
 
-std::map<char, PieceFactory> GameController::createPieceFactories() {
+std::map<char, PieceFactory> GameController::createPieceFactories() noexcept {
     std::map<char, PieceFactory> temp;
     temp['P'] = [](Piece::Colour color) { return std::make_unique<Pawn>(color); };
     temp['B'] = [](Piece::Colour color) { return std::make_unique<Bishop>(color); };
@@ -358,14 +358,14 @@ std::map<char, PieceFactory> GameController::createPieceFactories() {
 
 const std::map<char, PieceFactory> GameController::pieceFactories = createPieceFactories();
 
-bool GameController::isBackRow(const Location &square, const Player &player) const {
+bool GameController::isBackRow(const Location &square, const Player &player) const noexcept {
     if (player == game.whitePlayer) {
         return square.getBoardRowIndex() == Location::getMaxRowIndex();
     }
     return square.getBoardRowIndex() == 0;
 }
 
-Game::MoveInfo GameController::getMoveInfoFromUser() const {
+Game::MoveInfo GameController::getMoveInfoFromUser() const noexcept {
 
     const auto source = getLocationFromUser("Type source square: ");
     const auto destination = getLocationFromUser("Type destination square: ");
@@ -391,7 +391,7 @@ Game::MoveInfo GameController::getMoveInfoFromUser() const {
     return {source, destination, std::move(promotionPiece)};
 }
 
-Location GameController::getLocationFromUser(std::string_view message) const {
+Location GameController::getLocationFromUser(std::string_view message) const noexcept {
     while (true) {
         try {
             return Location{gameView->readInput(message)};
@@ -402,7 +402,7 @@ Location GameController::getLocationFromUser(std::string_view message) const {
     }
 }
 
-std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message) const {
+std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message) const noexcept {
     while (true) {
         const char pieceChar = gameView->readInput(message)[0];
         const char pieceCode = toupper(pieceChar, std::locale());
@@ -415,7 +415,7 @@ std::unique_ptr<Piece> GameController::getPieceFromUser(std::string_view message
     }
 }
 
-Location GameController::getLocationOfKing(const Player &player) const {
+Location GameController::getLocationOfKing(const Player &player) const noexcept {
     const auto& board = game.board.board;
     const auto& kingColour = player.getColour();
 
@@ -427,7 +427,7 @@ Location GameController::getLocationOfKing(const Player &player) const {
     return (it != board.end() ? it->first : Location{});
 }
 
-bool GameController::isUnderAttackBy(Location target, const Player &opponent) const {
+bool GameController::isUnderAttackBy(Location target, const Player &opponent) const noexcept {
     // NB: a square isn't marked as under attack if the attacker has a piece there.
     // En passant target squares are also not accounted for, but as isUnderAttack is a used in inCheck() and validMove()
     // and you cant castle through an en passant target square, this is a moot issue
@@ -441,7 +441,7 @@ bool GameController::isUnderAttackBy(Location target, const Player &opponent) co
     return std::any_of(board.cbegin(), board.cend(), isOpponentPieceAttackingTarget);
 }
 
-Player GameController::getStartingPlayer() const {
+Player GameController::getStartingPlayer() const noexcept {
     while (true) {
         const char startColour = toupper(gameView->readInput("Enter starting colour ('W' or 'B'): ")[0], std::locale());
         if (startColour == 'W') { return game.whitePlayer; }
@@ -450,7 +450,7 @@ Player GameController::getStartingPlayer() const {
     }
 }
 
-bool GameController::isDrawByInsufficientMaterial() const {
+bool GameController::isDrawByInsufficientMaterial() const noexcept {
     /** NB: This innocent-seeming function is more complex to implement in accordance with FIDE rules than it
      * may seem, due to the following also being classed as "Insufficient Material"
      *

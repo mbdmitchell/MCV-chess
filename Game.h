@@ -22,10 +22,10 @@ private:
     /// DATA MEMBERS
     Board board{};
     GameState gameState {IN_PROGRESS};
-    const Player whitePlayer {Piece::Colour::WHITE}; // TODO: const std::array<Player> players
+    const Player whitePlayer {Piece::Colour::WHITE};
     const Player blackPlayer {Piece::Colour::BLACK};
     Location enPassantTargetSquare{};
-    castlingAvailability whiteCastlingAvailability {.kingSide = true, .queenSide = true}; // TODO: player has castling Availability
+    castlingAvailability whiteCastlingAvailability {.kingSide = true, .queenSide = true};
     castlingAvailability blackCastlingAvailability {.kingSide = true, .queenSide = true};
     Player activePlayer = whitePlayer;
 
@@ -39,6 +39,6 @@ public:
     Game& operator=(const Game& other);
 
     /// MISC.
-    static std::string gameStateAsString(GameState gs);
+    static std::string gameStateAsString(GameState gs) noexcept;
 };
 
