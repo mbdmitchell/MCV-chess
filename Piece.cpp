@@ -48,7 +48,7 @@ bool Pawn::isValidMovePath(const Location &source,
     }
 
     // Location::isDiagonal(source, destination)) == true
-    const bool isEnPassant = enPassantTargetSquare == Location(source.get<0>().value(), destination.get<1>().value()); // TODO: Location(source.getRow(), destination.getColumn()));
+    const bool isEnPassant = (enPassantTargetSquare == Location{source.getBoardRowIndex().value(), destination.getBoardColumnIndex().value()});
     return isEnPassant || (isCapture && abs(deltaRow) == 1);
 }
 
