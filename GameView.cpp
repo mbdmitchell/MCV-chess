@@ -58,3 +58,35 @@ void GameViewCLI::displayTurn(const Player &player) const {
     std::string colourString = (player.getColour() == Piece::Colour::WHITE ? "White" : "Black");
     std::cout << std::format("{}'s turn\n", colourString);
 }
+
+GameViewOpenGL::GameViewOpenGL() {
+
+    if (!glfwInit()) { throw std::runtime_error("Cannot initialise GLFW"); }
+
+    // Set GLFW window hints before creating the window
+
+    window = glfwCreateWindow(640, 480, "Chess", nullptr, nullptr);
+
+    if (!window) {
+        glfwTerminate();
+        throw std::runtime_error("Failed to create GLFW window");
+    }
+
+    glfwMakeContextCurrent(window);
+
+    while (!glfwWindowShouldClose(window)) {
+
+        // Your game rendering logic goes here
+        // Clear the screen, render your chessboard, pieces, and other elements
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();                           // Poll for and process events
+    }
+
+    // Cleanup GLFW and other resources in the destructor
+}
+
+GameViewOpenGL::~GameViewOpenGL() {
+    glfwTerminate(); // Cleanup and terminate GLFW when the object is destroyed
+}
+

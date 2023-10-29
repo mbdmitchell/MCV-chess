@@ -1,5 +1,8 @@
 #include "GameController.h"
 
+#include "glfw-3.3.8/include/GLFW/glfw3.h"
+#define GL_SILENCE_DEPRECATION
+
 /* -----------------------------------------------------------------------------
 
 IDEA - probably won't implement but thought it was fun
@@ -19,8 +22,10 @@ public:
 ----------------------------------------------------------------------------- */
 
 int main() {
-    GameController g {new GameViewCLI};
+
+    GameController g {new GameViewOpenGL};
     g.setup();
-    g.initGameLoop();
+
+    /*g.initGameLoop();*/
     return EXIT_SUCCESS;
 }

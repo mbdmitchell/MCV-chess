@@ -2,6 +2,7 @@
 
 #include "Board.h"
 #include "Game.h"
+#include "glfw-3.3.8/include/GLFW/glfw3.h"
 
 class GameView {
 public:
@@ -35,3 +36,28 @@ public:
     }
 };
 
+class GameViewOpenGL : public GameView {
+private:
+    GLFWwindow* window;
+public:
+
+    GameViewOpenGL();
+
+    ~GameViewOpenGL() override;
+
+    void viewBoard(const Board &b) const override {
+        // TODO: Remove code duplication w/ GameViewCLI::viewBoard()
+
+    }
+    void viewPiece(const Piece& piece) const override {}
+
+    [[nodiscard]] std::string readInput(std::string_view message) const override {}
+
+    void displayEndOfGameMessage(Game::GameState gameState) const override {}
+    void displayTurn(const Player& player) const override {}
+
+    void displayException(const std::exception& e) const override {}
+    [[nodiscard]] std::unique_ptr<GameView> clone() const noexcept override {
+        return std::make_unique<GameViewOpenGL>(*this);
+    }
+};

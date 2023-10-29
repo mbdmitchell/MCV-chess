@@ -13,6 +13,7 @@ class Board {
     /// FRIENDS
     friend class GameController;
     friend class GameViewCLI;
+    friend class GameViewOpenGL;
 
     /// OPERATORS
 public:
