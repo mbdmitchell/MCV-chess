@@ -15,7 +15,7 @@ MCV Chess is a console-based chess program implemented using the Model-Controlle
 To build and run MCV Chess, follow these steps:
 
 1. Clone or download this repository to your local machine.
-2. Make sure you have the required dependencies (such as `fmt` and `gsl`) installed. (NB: this repository already includes these libraries)
+2. Make sure you have the required dependencies (such as `fmt` and `gsl`) installed. 
 3. Open your terminal and navigate to the project directory.
 4. Compile the source code using your preferred C++20 compiler, ensuring that the required dependencies are linked (if needed).
 5. Run the program.
